@@ -75,6 +75,17 @@ public class ChessPiece {
 
     @Override
     public String toString() {
-        return String.format("[%s, %s]", this.color, this.type);
+        String temp;
+        if ((ChessPiece.PieceType.KNIGHT).equals(this.getPieceType())) {
+            temp = "n";
+        } else {
+            temp = String.format("%s", this.type).substring(0,1);
+        }
+        if ((ChessGame.TeamColor.BLACK).equals(this.getTeamColor())) {
+            temp = temp.toLowerCase();
+        } else {
+            temp = temp.toUpperCase();
+        }
+        return temp;
     }
 }
