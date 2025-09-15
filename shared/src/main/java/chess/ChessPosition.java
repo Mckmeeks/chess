@@ -10,12 +10,12 @@ import java.util.Objects;
  */
 public class ChessPosition {
 
-    private int Row;
-    private int Col;
+    private int row;
+    private int col;
 
-    public ChessPosition(int row, int col) {
-        setRow(row);
-        setColumn(col);
+    public ChessPosition(int _row, int _col) {
+        setRow(_row);
+        setColumn(_col);
     }
 
     /**
@@ -23,7 +23,7 @@ public class ChessPosition {
      * 1 codes for the bottom row
      */
     public int getRow() {
-        return this.Row;
+        return this.row;
     }
 
     /**
@@ -31,15 +31,15 @@ public class ChessPosition {
      * 1 codes for the left row
      */
     public int getColumn() {
-        return this.Col;
+        return this.col;
     }
 
     public void setRow(int row) {
-        this.Row = row;
+        this.row = row;
     }
 
     public void setColumn(int col) {
-        this.Col = col;
+        this.col = col;
     }
 
     @Override
@@ -47,16 +47,16 @@ public class ChessPosition {
         if (this == o) return true;
         if (o == null || this.getClass() != o.getClass()) return false;
         ChessPosition comp = (ChessPosition)o;
-        return (this.Row == comp.Row && this.Col == comp.Col);
+        return (this.row == comp.row && this.col == comp.col);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(this.Row, this.Col);
+        return Objects.hash(this.row, this.col);
     }
 
     @Override
     public String toString() {
-        return String.format("(%d,%d)", this.Row, this.Col);
+        return String.format("(%d,%d)", this.row, this.col);
     }
 }
