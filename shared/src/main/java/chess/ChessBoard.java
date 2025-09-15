@@ -1,5 +1,8 @@
 package chess;
 
+import java.util.Arrays;
+import java.util.Objects;
+
 /**
  * A chessboard that can hold and rearrange chess pieces.
  * <p>
@@ -8,10 +11,9 @@ package chess;
  */
 public class ChessBoard {
 
-    public ChessBoard() {
-        
-    }
+    public ChessPiece[][] board = new ChessPiece[8][8];
 
+    public ChessBoard() {}
     /**
      * Adds a chess piece to the chessboard
      *
@@ -19,7 +21,7 @@ public class ChessBoard {
      * @param piece    the piece to add
      */
     public void addPiece(ChessPosition position, ChessPiece piece) {
-        throw new RuntimeException("Not implemented");
+        this.board[position.getRow()-1][position.getColumn()-1] = piece;
     }
 
     /**
@@ -30,7 +32,7 @@ public class ChessBoard {
      * position
      */
     public ChessPiece getPiece(ChessPosition position) {
-        throw new RuntimeException("Not implemented");
+        return this.board[position.getRow()-1][position.getColumn()-1];
     }
 
     /**
@@ -38,6 +40,62 @@ public class ChessBoard {
      * (How the game of chess normally starts)
      */
     public void resetBoard() {
-        throw new RuntimeException("Not implemented");
+        ChessPiece rook = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.ROOK);
+        ChessPiece knight = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KNIGHT);
+        ChessPiece bishop = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.BISHOP);
+        ChessPiece queen = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.QUEEN);
+        ChessPiece king = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KING);
+        ChessPiece pawn = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN);
+
+        ChessPiece Rook = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.ROOK);
+        ChessPiece Knight = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.KNIGHT);
+        ChessPiece Bishop = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.BISHOP);
+        ChessPiece Queen = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.QUEEN);
+        ChessPiece King = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.KING);
+        ChessPiece Pawn = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN);
+
+        board = new ChessPiece[][]{
+                {Rook, Knight, Bishop, Queen, King, Bishop.copy(), Knight.copy(), Rook.copy()},
+                {Pawn, Pawn.copy(), Pawn.copy(), Pawn.copy(), Pawn.copy(), Pawn.copy(), Pawn.copy(), Pawn.copy()},
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null},
+                {pawn, pawn.copy(), pawn.copy(), pawn.copy(), pawn.copy(), pawn.copy(), pawn.copy(), pawn.copy()},
+                {rook, knight, bishop, queen, king, bishop.copy(), knight.copy(), rook.copy()},
+        };
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ChessBoard comp = (ChessBoard)o;
+        return Objects.deepEquals(this.board, comp.board);
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.deepHashCode(this.board);
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder tempBoard = new StringBuilder();
+        for (ChessPiece[] row : this.board) {
+            StringBuilder tempColumn = new StringBuilder();
+            tempColumn.append("|");
+            for (ChessPiece col : row) {
+                if (col == null) {
+                    tempColumn.append(" ");
+                } else {
+                    tempColumn.append(col);
+                }
+                tempColumn.append("|");
+            }
+            tempBoard.append(tempColumn);
+            tempBoard.append("\n");
+        }
+        return tempBoard.toString();
     }
 }
