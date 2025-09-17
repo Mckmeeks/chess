@@ -32,7 +32,7 @@ public class ChessPositionCalculator {
             case ChessPiece.PieceType.KING -> new KingPositionCalculator(board, pos, piece);
             case ChessPiece.PieceType.QUEEN -> new QueenPositionCalculator(board, pos, piece);
             case ChessPiece.PieceType.PAWN -> new PawnPositionCalculator(board, pos, piece);
-            default -> null;
+            default -> new ChessPositionCalculator(board, pos, piece, new int[][]{{0,0}}, 0);
         };
     }
 
