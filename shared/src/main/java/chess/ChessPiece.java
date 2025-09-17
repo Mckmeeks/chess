@@ -2,6 +2,7 @@ package chess;
 
 import java.util.Collection;
 import java.util.Objects;
+import chess.PositionCalculator.ChessPositionCalculator;
 
 /**
  * Represents a single chess piece
@@ -53,7 +54,8 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        return ChessPositionCalculator.getMoves(board, myPosition, this);
+        var calculator = ChessPositionCalculator.getCalculator(board, myPosition, this);
+        return calculator.getMoves();
     }
 
     public ChessPiece copy() {
