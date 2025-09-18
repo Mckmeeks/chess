@@ -41,14 +41,14 @@ public class ChessPositionCalculator {
         int col;
         HashSet<ChessMove> moves = new HashSet<>();
 
-        for (int[] dir : validDirections) {
-            row = pos.getRow();
-            col = pos.getColumn();
+        for (int[] dir : this.validDirections) {
+            row = this.pos.getRow();
+            col = this.pos.getColumn();
 
             for (int i = 1; i <= maxSquares; i++) {
                 ChessPosition tempPos = new ChessPosition(row + dir[0] * i, col + dir[1] * i);
                 if (this.onBoard(tempPos)) {
-                    ChessPiece piece = board.getPiece(tempPos);
+                    ChessPiece piece = this.board.getPiece(tempPos);
                     if (piece == null) {
                         moves.add(new ChessMove(this.pos, tempPos, null));
                     } else {
@@ -67,7 +67,7 @@ public class ChessPositionCalculator {
         return this.piece.getPieceType();
     }
 
-    private boolean onBoard(ChessPosition pos){
+    public boolean onBoard(ChessPosition pos){
         return (1 <= pos.getRow() && pos.getRow() <= 8 && 1 <= pos.getColumn() && pos.getColumn() <= 8);
     }
 }
