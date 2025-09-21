@@ -1,79 +1,59 @@
 package chess.PositionCalculator;
 
 import chess.*;
-
 import java.util.HashSet;
 
-public class PawnPositionCalculator extends ChessPositionCalculator {
+public class PawnPositionCalculator extends ChessPositionCalculator{
+
+    private int start;
+    private int dir;
 
     public PawnPositionCalculator(ChessBoard board, ChessPosition pos, ChessPiece piece) {
-        super(board, pos, piece, new int[][]{{1, 0}, {0, 1}, {0, -1}}, 1);
+        super(board, pos, piece, new int[][] {{0,0}}, 0);
+        switch (piece.getTeamColor()) {
+            case ChessGame.TeamColor.WHITE -> {
+                start = 2;
+                dir = 1;
+            }
+            case ChessGame.TeamColor.BLACK -> {
+                start = 7;
+                dir = -1;
+            }
+        }
     }
 
     @Override
     public HashSet<ChessMove> getMoves() {
-        int row = this.pos.getRow();
-        int col = this.pos.getColumn();
-        int dir;
-        int start;
-        HashSet<ChessMove> moves = new HashSet<>();
-
-        start = switch (this.piece.getTeamColor()) {
-            case ChessGame.TeamColor.BLACK -> {
-                dir = -1;
-                yield 7;
-            }
-            case ChessGame.TeamColor.WHITE -> {
-                dir = 1;
-                yield 2;
-            }
-        };
-
-
-        ChessMove move = refactorCheckSpace(row + dir, col);
-        if (move != null) {
-            if (this.pos.getRow() == start) {
-                moves.add(move);
-                ChessMove move2 = refactorCheckSpace(row + dir * 2, col);
-                if (move2 != null) moves.add(move2);
-            } else {
-                moves.addAll(promotions(new ChessPosition(row + dir, col)));
-            }
-        }
-
-
-        ChessPosition side;
-        for (int i : new int[]{-1, 1}) {
-            side = new ChessPosition(row + dir, col - i);
-            if (this.onBoard(side)) {
-                ChessPiece tempPiece = this.board.getPiece(side);
-                if (tempPiece != null && !(this.piece.getTeamColor().equals(tempPiece.getTeamColor()))) {
-                    moves.addAll(promotions(side));
+        HashSet<ChessMove> tempMoves = new HashSet<>();
+        ChessPosition tempPos = new ChessPosition(this.pos.getRow() + dir, this.pos.getColumn());
+        if (onBoard(tempPos)) {
+            if (this.board.getPiece(tempPos) == null) {
+                tempMoves.addAll(getPromotions(tempPos));
+                if (this.pos.getRow() == start) {
+                    tempPos = new ChessPosition(this.pos.getRow() + 2 * dir, this.pos.getColumn());
+                    if (this.board.getPiece(tempPos) == null) tempMoves.add(new ChessMove(this.pos, tempPos, null));
                 }
             }
         }
-        return moves;
-    }
-
-    private ChessMove refactorCheckSpace(int row, int col) {
-        ChessPosition newPos = new ChessPosition(row, col);
-        if (this.onBoard(newPos)) {
-            if (this.board.getPiece(newPos) == null) {
-                return new ChessMove(this.pos, newPos, null);
-            }
-        }
-        return null;
-    }
-
-    private HashSet<ChessMove> promotions(ChessPosition pos) {
-        HashSet<ChessMove> moves = new HashSet<>();
-        if (pos.getRow() == 1 || pos.getRow() == 8) {
-            for (ChessPiece.PieceType type : ChessPiece.PieceType.values()) {
-                if (type != ChessPiece.PieceType.KING && type != ChessPiece.PieceType.PAWN) {
-                    moves.add(new ChessMove(this.pos, pos, type));
+        for (int cor : new int[] {-1,1}) {
+            tempPos = new ChessPosition(this.pos.getRow() + dir, this.pos.getColumn() + cor);
+            if (onBoard(tempPos)) {
+                ChessPiece tempPiece = this.board.getPiece(tempPos);
+                if (tempPiece != null && (tempPiece.getTeamColor() != this.piece.getTeamColor())) {
+                    tempMoves.addAll(getPromotions(tempPos));
                 }
             }
-        } else moves.add(new ChessMove(this.pos, pos, null));
-        return moves;
+        }
+        return tempMoves;
+    }
+
+    private HashSet<ChessMove> getPromotions(ChessPosition tempPos) {
+        HashSet<ChessMove> tempMoves = new HashSet<>();
+        if (tempPos.getRow() == 1 || tempPos.getRow() == 8) {
+            for (ChessPiece.PieceType type : new ChessPiece.PieceType[] {ChessPiece.PieceType.KNIGHT, ChessPiece.PieceType.QUEEN, ChessPiece.PieceType.BISHOP, ChessPiece.PieceType.ROOK}) {
+                tempMoves.add(new ChessMove(this.pos, tempPos, type));
+            }
+        } else tempMoves.add(new ChessMove(this.pos, tempPos, null));
+        return tempMoves;
     }
 }
