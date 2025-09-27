@@ -4,7 +4,7 @@ import java.util.HashSet;
 
 import chess.*;
 
-public class ChessPositionCalculator {
+public class Calculator {
 
     protected int[][] validDirections;
     protected int maxSquares;
@@ -13,9 +13,9 @@ public class ChessPositionCalculator {
     public ChessPosition pos;
     public ChessPiece piece;
 
-    public ChessPositionCalculator(){}
+    public Calculator(){}
 
-    public ChessPositionCalculator(ChessBoard board, ChessPosition pos, ChessPiece piece, int[][] validDirections, int multipleSquares){
+    public Calculator(ChessBoard board, ChessPosition pos, ChessPiece piece, int[][] validDirections, int multipleSquares){
         this.board = board;
         this.pos = pos;
         this.piece = piece;
@@ -23,16 +23,16 @@ public class ChessPositionCalculator {
         this.maxSquares = multipleSquares;
     }
 
-    public static ChessPositionCalculator getCalculator(ChessBoard board, ChessPosition pos, ChessPiece piece) {
+    public static Calculator getCalculator(ChessBoard board, ChessPosition pos, ChessPiece piece) {
 
         return switch (piece.getPieceType()) {
-            case ChessPiece.PieceType.ROOK -> new RookPositionCalculator(board, pos, piece);
-            case ChessPiece.PieceType.KNIGHT -> new KnightPositionCalculator(board, pos, piece);
-            case ChessPiece.PieceType.BISHOP -> new BishopPositionCalculator(board, pos, piece);
-            case ChessPiece.PieceType.KING -> new KingPositionCalculator(board, pos, piece);
-            case ChessPiece.PieceType.QUEEN -> new QueenPositionCalculator(board, pos, piece);
-            case ChessPiece.PieceType.PAWN -> new PawnPositionCalculator(board, pos, piece);
-            default -> new ChessPositionCalculator(board, pos, piece, new int[][]{{0,0}}, 0);
+            case ChessPiece.PieceType.ROOK -> new Rook(board, pos, piece);
+            case ChessPiece.PieceType.KNIGHT -> new Knight(board, pos, piece);
+            case ChessPiece.PieceType.BISHOP -> new Bishop(board, pos, piece);
+            case ChessPiece.PieceType.KING -> new King(board, pos, piece);
+            case ChessPiece.PieceType.QUEEN -> new Queen(board, pos, piece);
+            case ChessPiece.PieceType.PAWN -> new Pawn(board, pos, piece);
+            default -> new Calculator(board, pos, piece, new int[][]{{0,0}}, 0);
         };
     }
 

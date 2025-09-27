@@ -3,12 +3,12 @@ package chess.PositionCalculator;
 import chess.*;
 import java.util.HashSet;
 
-public class PawnPositionCalculator extends ChessPositionCalculator{
+public class Pawn extends Calculator {
 
     private int start;
     private int dir;
 
-    public PawnPositionCalculator(ChessBoard board, ChessPosition pos, ChessPiece piece) {
+    public Pawn(ChessBoard board, ChessPosition pos, ChessPiece piece) {
         super(board, pos, piece, new int[][] {{0,0}}, 0);
         switch (piece.getTeamColor()) {
             case ChessGame.TeamColor.WHITE -> {

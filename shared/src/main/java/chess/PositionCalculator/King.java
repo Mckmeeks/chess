@@ -2,9 +2,9 @@ package chess.PositionCalculator;
 
 import chess.*;
 
-public class KingPositionCalculator extends ChessPositionCalculator {
+public class King extends Calculator {
 
-    public KingPositionCalculator(ChessBoard board, ChessPosition pos, ChessPiece piece) {
+    public King(ChessBoard board, ChessPosition pos, ChessPiece piece) {
         super(board, pos, piece, new int[][] {{1, 0},{0,1},{-1,0},{0,-1},{1,1},{1,-1},{-1,1},{-1,-1}}, 1);
     }
 }
