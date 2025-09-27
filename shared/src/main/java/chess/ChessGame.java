@@ -21,7 +21,9 @@ public class ChessGame {
 
     public ChessGame() {
         setTeamTurn(TeamColor.WHITE);
-        setBoard(new ChessBoard());
+        ChessBoard tempBoard = new ChessBoard();
+        tempBoard.resetBoard();
+        setBoard(tempBoard);
     }
 
     /**
