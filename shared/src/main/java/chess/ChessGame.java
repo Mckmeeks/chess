@@ -59,7 +59,7 @@ public class ChessGame {
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         ChessPiece hero = board.getPiece(startPosition);
-        if (hero == null) return null;
+        if (hero == null) {return null;}
         ChessPosition kingPos;
         HashSet<ChessPosition> opTeam;
         TeamColor heroColor = hero.getTeamColor();
@@ -95,12 +95,12 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        if (move == null) throw new InvalidMoveException("Move is null");
+        if (move == null) {throw new InvalidMoveException("Move is null");}
         Collection<ChessMove> moves = validMoves(move.getStartPosition());
-        if (moves == null) throw new InvalidMoveException("Moves start position is empty");
+        if (moves == null) {throw new InvalidMoveException("Moves start position is empty");}
         if (moves.contains(move)) {
             ChessPiece temp = board.getPiece(move.getStartPosition());
-            if (temp.getTeamColor() != teamTurn) throw new InvalidMoveException("Move attempted out of turn");
+            if (temp.getTeamColor() != teamTurn) {throw new InvalidMoveException("Move attempted out of turn");}
             HashSet<ChessPosition> team = (temp.getTeamColor() == TeamColor.WHITE) ? wTeam : bTeam;
             HashSet<ChessPosition> opTeam = (temp.getTeamColor() == TeamColor.WHITE) ? bTeam : wTeam;
             board.addPiece(move.getStartPosition(), null);
@@ -173,7 +173,7 @@ public class ChessGame {
         for (int r = 1; r <= 8; r++) {
             for (int c = 1; c <= 8; c++) {
                 ChessPiece temp = board.getPiece(new ChessPosition(r, c));
-                if (temp == null) continue;
+                if (temp == null) {continue;}
                 if (temp.getTeamColor() == TeamColor.WHITE) {
                     wTeam.add(new ChessPosition(r, c));
                     if (temp.getPieceType() == ChessPiece.PieceType.KING) {wKingLoc = new ChessPosition(r, c);}
@@ -198,9 +198,9 @@ public class ChessGame {
         var snipers = new HashSet<ChessMove>();
         for (ChessPosition p : team) {
             ChessPiece temp = board.getPiece(p);
-            if (temp == null) throw new UntrackedPieceException(String.format("Position %s returned null when in team set.", p));
+            if (temp == null) {throw new UntrackedPieceException(String.format("Position %s returned null when in team set.", p));}
             for (ChessMove move : temp.pieceMoves(board, p)) {
-                if (kingPos.equals(move.getEndPosition())) snipers.add(move);
+                if (kingPos.equals(move.getEndPosition())) {snipers.add(move);}
             }
         }
         return snipers;
@@ -223,19 +223,23 @@ public class ChessGame {
     }
 
     private boolean blocks(ChessPosition pos, ChessMove path) {
-        if (pos.equals(path.getStartPosition())) return true; //takes offending piece
-        if (path.getStartPosition().getRow() == path.getEndPosition().getRow()) { //blocks path
-            return (path.getStartPosition().getColumn() < pos.getColumn() && pos.getColumn() < path.getEndPosition().getColumn()) && (pos.getRow() == path.getEndPosition().getRow());
+        ChessPosition pathStart = path.getStartPosition();
+        ChessPosition pathEnd = path.getEndPosition();
+        if (pos.equals(pathStart)) {return true;} //takes offending piece
+        if (pathStart.getRow() == pathEnd.getRow()) { //blocks path
+            return (pathStart.getColumn() < pos.getColumn() && pos.getColumn() < pathEnd.getColumn()) && (pos.getRow() == pathEnd.getRow());
         }
-        else if (path.getStartPosition().getColumn() == path.getEndPosition().getColumn()) {
-            return (path.getStartPosition().getRow() < pos.getRow() && pos.getRow() < path.getEndPosition().getRow()) && (pos.getColumn() == path.getEndPosition().getColumn());
+        else if (pathStart.getColumn() == pathEnd.getColumn()) {
+            return (pathStart.getRow() < pos.getRow() && pos.getRow() < pathEnd.getRow()) && (pos.getColumn() == pathEnd.getColumn());
         }
-        int rowDif = path.getStartPosition().getRow() - path.getEndPosition().getRow();
-        int colDif = path.getStartPosition().getColumn() - path.getEndPosition().getColumn();
-        if (Math.abs(rowDif) != Math.abs(colDif)) return false;
+        int rowDif = pathStart.getRow() - pathEnd.getRow();
+        int colDif = pathStart.getColumn() - pathEnd.getColumn();
+        if (Math.abs(rowDif) != Math.abs(colDif)) {return false;}
         else {
+            int rowDir = Integer.signum(rowDif);
+            int colDir = Integer.signum(colDif);
             for (int dis = 1; dis <= Math.abs(rowDif); dis++) {
-                if (pos.getRow() == path.getStartPosition().getRow() - Integer.signum(rowDif) * dis && pos.getColumn() == path.getStartPosition().getColumn() - Integer.signum(colDif) * dis) {
+                if (pos.getRow() == pathStart.getRow() - rowDir * dis && pos.getColumn() == pathStart.getColumn() - colDir * dis) {
                     return true;
                 }
             }
@@ -245,8 +249,8 @@ public class ChessGame {
 
     @Override
     public boolean equals(Object o) {
-        if (o == null) return false;
-        if (!(this.getClass().equals(o.getClass()))) return false;
+        if (o == null) {return false;}
+        if (!(this.getClass().equals(o.getClass()))) {return false;}
         ChessGame comp = (ChessGame)o;
         return (this.getTeamTurn() == comp.getTeamTurn() && this.getBoard().equals(comp.getBoard()));
     }

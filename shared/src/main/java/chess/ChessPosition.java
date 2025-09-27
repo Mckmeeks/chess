@@ -13,9 +13,9 @@ public class ChessPosition {
     private int row;
     private int col;
 
-    public ChessPosition(int _row, int _col) {
-        setRow(_row);
-        setColumn(_col);
+    public ChessPosition(int row, int col) {
+        setRow(row);
+        setColumn(col);
     }
 
     /**
@@ -44,8 +44,8 @@ public class ChessPosition {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || this.getClass() != o.getClass()) return false;
+        if (this == o) {return true;}
+        if (o == null || this.getClass() != o.getClass()) {return false;}
         ChessPosition comp = (ChessPosition)o;
         return (this.row == comp.row && this.col == comp.col);
     }

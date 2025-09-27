@@ -47,20 +47,20 @@ public class ChessBoard {
         ChessPiece king = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KING);
         ChessPiece pawn = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN);
 
-        ChessPiece Rook = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.ROOK);
-        ChessPiece Knight = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.KNIGHT);
-        ChessPiece Bishop = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.BISHOP);
-        ChessPiece Queen = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.QUEEN);
-        ChessPiece King = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.KING);
-        ChessPiece Pawn = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN);
+        ChessPiece wRook = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.ROOK);
+        ChessPiece wKnight = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.KNIGHT);
+        ChessPiece wBishop = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.BISHOP);
+        ChessPiece wQueen = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.QUEEN);
+        ChessPiece wKing = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.KING);
+        ChessPiece wPawn = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN);
 
         board = new ChessPiece[][]{
-                {Rook, Knight, Bishop, Queen, King, Bishop.copy(), Knight.copy(), Rook.copy()},
-                {Pawn, Pawn.copy(), Pawn.copy(), Pawn.copy(), Pawn.copy(), Pawn.copy(), Pawn.copy(), Pawn.copy()},
-                {null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null},
+                {wRook, wKnight, wBishop, wQueen, wKing, wBishop.copy(), wKnight.copy(), wRook.copy()},
+                {wPawn, wPawn.copy(), wPawn.copy(), wPawn.copy(), wPawn.copy(), wPawn.copy(), wPawn.copy(), wPawn.copy()},
+                new ChessPiece[8],
+                new ChessPiece[8],
+                new ChessPiece[8],
+                new ChessPiece[8],
                 {pawn, pawn.copy(), pawn.copy(), pawn.copy(), pawn.copy(), pawn.copy(), pawn.copy(), pawn.copy()},
                 {rook, knight, bishop, queen, king, bishop.copy(), knight.copy(), rook.copy()},
         };
@@ -68,8 +68,8 @@ public class ChessBoard {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {return true;}
+        if (o == null || getClass() != o.getClass()) {return false;}
         ChessBoard comp = (ChessBoard)o;
         return Objects.deepEquals(this.board, comp.board);
     }

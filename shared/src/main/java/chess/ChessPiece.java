@@ -2,7 +2,7 @@ package chess;
 
 import java.util.Collection;
 import java.util.Objects;
-import chess.PositionCalculator.Calculator;
+import chess.positioning.Calculator;
 
 /**
  * Represents a single chess piece
@@ -64,8 +64,8 @@ public class ChessPiece {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || (o.getClass() != this.getClass())) return false;
+        if (this == o) {return true;}
+        if (o == null || (o.getClass() != this.getClass())) {return false;}
         ChessPiece comp = (ChessPiece)o;
         return (this.color.equals(comp.color) && this.type.equals(comp.type));
     }

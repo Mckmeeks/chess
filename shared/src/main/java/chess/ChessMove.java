@@ -47,10 +47,10 @@ public class ChessMove {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || o.getClass() != this.getClass()) return false;
+        if (this == o) {return true;}
+        if (o == null || o.getClass() != this.getClass()) {return false;}
         ChessMove comp = (ChessMove)o;
-        if  (this.startPosition.equals(comp.startPosition) && this.endPosition.equals(comp.endPosition)) {
+        if (this.startPosition.equals(comp.startPosition) && this.endPosition.equals(comp.endPosition)) {
             if (this.promotionPiece != null && comp.promotionPiece != null) {
                 return this.promotionPiece.equals(comp.promotionPiece);
             } else {

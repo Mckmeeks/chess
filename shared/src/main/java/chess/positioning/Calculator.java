@@ -1,4 +1,4 @@
-package chess.PositionCalculator;
+package chess.positioning;
 
 import java.util.HashSet;
 
@@ -47,17 +47,14 @@ public class Calculator {
 
             for (int i = 1; i <= maxSquares; i++) {
                 ChessPosition tempPos = new ChessPosition(row + dir[0] * i, col + dir[1] * i);
-                if (this.onBoard(tempPos)) {
-                    ChessPiece piece = this.board.getPiece(tempPos);
-                    if (piece == null) {
-                        moves.add(new ChessMove(this.pos, tempPos, null));
-                    } else {
-                        if (!(this.piece.getTeamColor().equals(piece.getTeamColor()))) {
-                            moves.add(new ChessMove(this.pos, tempPos, null));
-                        }
-                        break;
-                    }
-                } else break;
+                if (!this.onBoard(tempPos)) {break;}
+                ChessPiece piece = this.board.getPiece(tempPos);
+                if (piece == null) {moves.add(new ChessMove(this.pos, tempPos, null));}
+                else {
+                    if (!(this.piece.getTeamColor().equals(piece.getTeamColor()))) {
+                        moves.add(new ChessMove(this.pos, tempPos, null));}
+                    break;
+                }
             }
         }
         return moves;

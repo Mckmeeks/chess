@@ -1,4 +1,4 @@
-package chess.PositionCalculator;
+package chess.positioning;
 
 import chess.*;
 

@@ -1,4 +1,4 @@
-package chess.PositionCalculator;
+package chess.positioning;
 
 import chess.*;
 import java.util.HashSet;
@@ -31,7 +31,7 @@ public class Pawn extends Calculator {
                 tempMoves.addAll(getPromotions(tempPos));
                 if (this.pos.getRow() == start) {
                     tempPos = new ChessPosition(this.pos.getRow() + 2 * dir, this.pos.getColumn());
-                    if (this.board.getPiece(tempPos) == null) tempMoves.add(new ChessMove(this.pos, tempPos, null));
+                    if (this.board.getPiece(tempPos) == null) {tempMoves.add(new ChessMove(this.pos, tempPos, null));}
                 }
             }
         }
@@ -50,10 +50,12 @@ public class Pawn extends Calculator {
     private HashSet<ChessMove> getPromotions(ChessPosition tempPos) {
         HashSet<ChessMove> tempMoves = new HashSet<>();
         if (tempPos.getRow() == 1 || tempPos.getRow() == 8) {
-            for (ChessPiece.PieceType type : new ChessPiece.PieceType[] {ChessPiece.PieceType.KNIGHT, ChessPiece.PieceType.QUEEN, ChessPiece.PieceType.BISHOP, ChessPiece.PieceType.ROOK}) {
+            for (ChessPiece.PieceType type : new ChessPiece.PieceType[] {
+                    ChessPiece.PieceType.KNIGHT, ChessPiece.PieceType.QUEEN, ChessPiece.PieceType.BISHOP, ChessPiece.PieceType.ROOK}
+                ) {
                 tempMoves.add(new ChessMove(this.pos, tempPos, type));
             }
-        } else tempMoves.add(new ChessMove(this.pos, tempPos, null));
+        } else {tempMoves.add(new ChessMove(this.pos, tempPos, null));}
         return tempMoves;
     }
 }
