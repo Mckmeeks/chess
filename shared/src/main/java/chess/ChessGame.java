@@ -62,7 +62,8 @@ public class ChessGame {
         if (hero == null) return null;
         ChessPosition kingPos;
         HashSet<ChessPosition> opTeam;
-        if (hero.getTeamColor() == TeamColor.WHITE) {
+        TeamColor heroColor = hero.getTeamColor();
+        if (heroColor == TeamColor.WHITE) {
             kingPos = wKingLoc;
             opTeam = bTeam;
         } else {
@@ -74,12 +75,12 @@ public class ChessGame {
         if (hero.getPieceType() != ChessPiece.PieceType.KING) {board.addPiece(startPosition, null);}
         HashSet<ChessMove> dangers = checkCheckBy(opTeam, kingPos);
         for (ChessMove heroMove : moves) {
-            if (hero.getPieceType() == ChessPiece.PieceType.KING && !checkCheckBy(opTeam, heroMove.getEndPosition()).isEmpty()) {movesReturnable.remove(heroMove);}
+            if (hero.getPieceType() == ChessPiece.PieceType.KING) {
+                if (!(kingCheckBy(opTeam, heroMove.getEndPosition(), heroColor).isEmpty())) {movesReturnable.remove(heroMove);}
+            }
             else {
                 for (ChessMove danger : dangers) {
-                    if (!blocks(heroMove.getEndPosition(), danger)) {
-                        movesReturnable.remove(heroMove);
-                    }
+                    if (!blocks(heroMove.getEndPosition(), danger)) {movesReturnable.remove(heroMove);}
                 }
             }
         }
@@ -134,7 +135,15 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        return (isInCheck(teamColor) && validMoves((teamColor == TeamColor.WHITE) ? wKingLoc : bKingLoc).isEmpty());
+        HashSet<ChessMove> teamMoves = new HashSet<>();
+        boolean check = isInCheck(teamColor);
+        if (check) {
+            HashSet<ChessPosition> team = (teamColor == TeamColor.WHITE) ? wTeam : bTeam;
+            for (ChessPosition pos : team) {
+                teamMoves.addAll(validMoves(pos));
+            }
+        }
+        return check && teamMoves.isEmpty();
     }
 
 
@@ -146,8 +155,10 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        return false; //implement
-//        throw new RuntimeException("Not implemented");
+        HashSet<ChessMove> teamMoves = new HashSet<>();
+        HashSet<ChessPosition> team = (teamColor == TeamColor.WHITE) ? wTeam : bTeam;
+        for (ChessPosition pos : team) {teamMoves.addAll(validMoves(pos));}
+        return !isInCheck(teamColor) && teamMoves.isEmpty();
     }
 
     /**
@@ -191,6 +202,22 @@ public class ChessGame {
             for (ChessMove move : temp.pieceMoves(board, p)) {
                 if (kingPos.equals(move.getEndPosition())) snipers.add(move);
             }
+        }
+        return snipers;
+    }
+
+    private HashSet<ChessMove> kingCheckBy(HashSet<ChessPosition> team, ChessPosition kingPos, TeamColor kingColor) {
+        ChessPiece target = board.getPiece(kingPos);
+        HashSet<ChessMove> snipers;
+        board.addPiece(kingPos, new ChessPiece(kingColor, ChessPiece.PieceType.PAWN));
+        if (target != null && target.getPieceType() != ChessPiece.PieceType.KING) {
+            team.remove(kingPos);
+            snipers = checkCheckBy(team, kingPos);
+            board.addPiece(kingPos, target);
+            team.add(kingPos);
+        } else {
+            snipers = checkCheckBy(team, kingPos);
+            board.addPiece(kingPos, null);
         }
         return snipers;
     }
