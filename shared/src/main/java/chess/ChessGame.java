@@ -74,10 +74,14 @@ public class ChessGame {
         if (hero.getPieceType() != ChessPiece.PieceType.KING) {board.addPiece(startPosition, null);}
         HashSet<ChessMove> dangers = checkCheckBy(opTeam, kingPos);
         for (ChessMove heroMove : moves) {
-            for (ChessMove danger : dangers) {
-                if (!blocks(heroMove.getEndPosition(), danger)) {movesReturnable.remove(heroMove);}
-            }
             if (hero.getPieceType() == ChessPiece.PieceType.KING && !checkCheckBy(opTeam, heroMove.getEndPosition()).isEmpty()) {movesReturnable.remove(heroMove);}
+            else {
+                for (ChessMove danger : dangers) {
+                    if (!blocks(heroMove.getEndPosition(), danger)) {
+                        movesReturnable.remove(heroMove);
+                    }
+                }
+            }
         }
         if (hero.getPieceType() != ChessPiece.PieceType.KING) {board.addPiece(startPosition, hero);}
         return movesReturnable;
@@ -130,8 +134,7 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-//        throw new RuntimeException("Not implemented");
-        return false;
+        return (isInCheck(teamColor) && validMoves((teamColor == TeamColor.WHITE) ? wKingLoc : bKingLoc).isEmpty());
     }
 
 
