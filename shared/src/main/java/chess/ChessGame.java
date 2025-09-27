@@ -88,17 +88,27 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        if (validMoves(move.getStartPosition()).contains(move)) {
+        if (move == null) throw new InvalidMoveException("Move is null");
+        Collection<ChessMove> moves = validMoves(move.getStartPosition());
+        if (moves == null) throw new InvalidMoveException("Moves start position is empty");
+        if (moves.contains(move)) {
             ChessPiece temp = board.getPiece(move.getStartPosition());
+            if (temp.getTeamColor() != teamTurn) throw new InvalidMoveException("Move attempted out of turn");
+            HashSet<ChessPosition> team = (temp.getTeamColor() == TeamColor.WHITE) ? wTeam : bTeam;
+            HashSet<ChessPosition> opTeam = (temp.getTeamColor() == TeamColor.WHITE) ? bTeam : wTeam;
             board.addPiece(move.getStartPosition(), null);
+            team.remove(move.getStartPosition());
             if (move.getPromotionPiece() != null) {
                 temp = new ChessPiece(temp.getTeamColor(), move.getPromotionPiece());
             }
             board.addPiece(move.getEndPosition(), temp);
+            team.add(move.getEndPosition());
+            opTeam.remove(move.getEndPosition());
+            setTeamTurn(temp.getTeamColor() == TeamColor.WHITE ? TeamColor.BLACK : TeamColor.WHITE);
         } else {
             throw new InvalidMoveException("Attempted Invalid Move");
         }
-    } // add wTeam removal implementation.
+    }
 
     /**
      * Determines if the given team is in check
