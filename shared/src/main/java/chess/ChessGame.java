@@ -225,8 +225,8 @@ public class ChessGame {
     private boolean blocks(ChessPosition pos, ChessMove path) {
         ChessPosition pathStart = path.getStartPosition();
         ChessPosition pathEnd = path.getEndPosition();
-        if (pos.equals(pathStart)) {return true;} //takes offending piece
-        if (pathStart.getRow() == pathEnd.getRow()) { //blocks path
+        if (pos.equals(pathStart)) {return true;}
+        if (pathStart.getRow() == pathEnd.getRow()) {
             return (pathStart.getColumn() < pos.getColumn() && pos.getColumn() < pathEnd.getColumn()) && (pos.getRow() == pathEnd.getRow());
         }
         else if (pathStart.getColumn() == pathEnd.getColumn()) {
