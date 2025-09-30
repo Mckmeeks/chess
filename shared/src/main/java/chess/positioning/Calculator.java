@@ -13,8 +13,6 @@ public class Calculator {
     public ChessPosition pos;
     public ChessPiece piece;
 
-    public Calculator(){}
-
     public Calculator(ChessBoard board, ChessPosition pos, ChessPiece piece, int[][] validDirections, int multipleSquares){
         this.board = board;
         this.pos = pos;
