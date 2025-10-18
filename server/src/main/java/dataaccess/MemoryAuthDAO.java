@@ -14,9 +14,9 @@ public class MemoryAuthDAO implements AuthDAO{
 
     @Override
     public boolean createAuth(AuthData a) {
-        if (authDataDB.containsKey(a.authToken())) {return false;}
+        if (authDataDB.containsKey(a.authToken())) {return true;}
         authDataDB.put(a.authToken(), a);
-        return true;
+        return false;
     }
 
     @Override
