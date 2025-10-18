@@ -24,9 +24,10 @@ public class Registration {
         serializer = new Gson();
     }
 
-    public RegisterResult run(String jsonRequest) throws JsonSyntaxException, AlreadyTakenException {
+    public String run(String jsonRequest) throws JsonSyntaxException, AlreadyTakenException {
         User userService = new User(uDAO, aDAO);
         RegisterRequest request = serializer.fromJson(jsonRequest, RegisterRequest.class);
-        return userService.register(request);
+        RegisterResult result = userService.register(request);
+        return serializer.toJson(result);
     }
 }
