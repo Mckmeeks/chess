@@ -13,9 +13,10 @@ public class MemoryAuthDAO implements AuthDAO{
     }
 
     @Override
-    public void createAuth(AuthData a) throws AlreadyTakenException {
-        if (authDataDB.containsKey(a.authToken())) {throw new AlreadyTakenException ("Error: authToken already in use, provide new authToken");}
+    public boolean createAuth(AuthData a) {
+        if (authDataDB.containsKey(a.authToken())) {return false;}
         authDataDB.put(a.authToken(), a);
+        return true;
     }
 
     @Override
