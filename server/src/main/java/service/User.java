@@ -2,6 +2,7 @@ package service;
 
 import java.util.UUID;
 
+import dataaccess.InvalidAuthorizationException;
 import dataaccess.interfaces.UserDAO;
 import dataaccess.interfaces.AuthDAO;
 
@@ -9,6 +10,11 @@ import dataaccess.AlreadyTakenException;
 
 import handler.request.RegisterRequest;
 import service.result.RegisterResult;
+
+import handler.request.LoginRequest;
+import service.result.LoginResult;
+
+import service.result.LogoutResult;
 
 import model.UserData;
 import model.AuthData;
@@ -26,6 +32,19 @@ public class User {
         uDAO.createUser(new UserData(request.username(), request.password(), request.email()));
         AuthData data = createAuthData(request.username());
         return new RegisterResult(data.username(), data.authToken());
+    }
+
+    public LoginResult login(LoginRequest request) throws InvalidAuthorizationException {
+        UserData userData = uDAO.getUser(request.username());
+        if (userData == null) {throw new InvalidAuthorizationException("Error: unauthorized");}
+        if (!userData.password().equals(request.password())) {throw new InvalidAuthorizationException("Error: unauthorized");}
+        AuthData data = createAuthData(request.username());
+        return new LoginResult(data.username(), data.authToken());
+    }
+
+    public LogoutResult logout(String request) throws InvalidAuthorizationException {
+        aDAO.deleteAuth(request);
+        return new LogoutResult();
     }
 
     private AuthData createAuthData(String username) {
