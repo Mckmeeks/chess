@@ -1,6 +1,7 @@
 package dataaccess.interfaces;
 
 import dataaccess.AlreadyTakenException;
+import dataaccess.InvalidAuthorizationException;
 import model.UserData;
 
 public interface UserDAO {
