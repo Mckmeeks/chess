@@ -1,18 +1,16 @@
 package server;
 
+import dataaccess.*;
 import io.javalin.*;
 
 import com.google.gson.JsonSyntaxException;
-import dataaccess.AlreadyTakenException;
 
 import dataaccess.interfaces.*;
-import dataaccess.MemoryAuthDAO;
-import dataaccess.MemoryGameDAO;
-import dataaccess.MemoryUserDAO;
 
 import handler.*;
 
 import kotlin.NotImplementedError;
+import service.DeleteDB;
 
 public class Server {
 
@@ -32,11 +30,33 @@ public class Server {
             context.result(result);
         });
 
+        javalin.post("/session", context -> {
+            var LoginHandler = new Login(uDAO, aDAO);
+            String result = LoginHandler.run(context.body());
+            context.result(result);
+        });
+
+        javalin.delete("/session", context -> {
+            var LogoutHandler = new Logout(aDAO);
+            String result = LogoutHandler.run(context.header("Authorization"));
+            context.result(result);
+        });
+
+        javalin.delete("/db", context -> {
+            DeleteDB dataService = new DeleteDB(uDAO, aDAO, gDAO);
+            dataService.clear();
+            context.result("{}");
+        });
 
 
         javalin.exception(JsonSyntaxException.class, (e, context) -> {
             context.status(400);
             context.result("{\"message\": \"Error: bad request\"}");
+        });
+
+        javalin.exception(InvalidAuthorizationException.class, (e, context) -> {
+            context.status(401);
+            context.result("{\"message\": \"Error: unauthorized\"}");
         });
 
         javalin.exception(AlreadyTakenException.class, (e, context) -> {
@@ -46,7 +66,8 @@ public class Server {
 
         javalin.exception(Exception.class, (e, context) -> {
             context.status(500);
-            context.result("{\"message\": " + "Error: " + e.getMessage() + "\"}");
+            context.result("{\"message\": \"Error: (" + e.getMessage().replace("\"", "") + ")\"}");
+            System.out.println(e.getMessage());
         });
     }
 
