@@ -54,6 +54,12 @@ public class Server {
             context.result(result);
         });
 
+        javalin.put("/game", context -> {
+            var JoinHandler = new Join(aDAO, gDAO);
+            String result = JoinHandler.run(context.header("Authorization"), context.body());
+            context.result(result);
+        });
+
         javalin.delete("/db", context -> {
             DeleteDB dataService = new DeleteDB(uDAO, aDAO, gDAO);
             dataService.clear();
