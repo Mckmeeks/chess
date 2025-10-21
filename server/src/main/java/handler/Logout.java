@@ -1,21 +1,17 @@
 package handler;
 
-import com.google.gson.Gson;
 import dataaccess.InvalidAuthorizationException;
 
 import dataaccess.interfaces.AuthDAO;
 
-import service.User;
 import service.result.LogoutResult;
 
+import service.User;
 
-public class Logout {
-    private final AuthDAO aDAO;
-    private final Gson serializer;
+public class Logout extends Handler {
 
     public Logout(AuthDAO authDataAcc) {
-        aDAO = authDataAcc;
-        serializer = new Gson();
+        super(authDataAcc);
     }
 
     public String run(String authToken) throws InvalidAuthorizationException {

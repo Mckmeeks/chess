@@ -1,7 +1,5 @@
 package handler;
 
-import com.google.gson.Gson;
-
 import com.google.gson.JsonSyntaxException;
 
 import dataaccess.InvalidAuthorizationException;
@@ -14,15 +12,12 @@ import dataaccess.interfaces.AuthDAO;
 
 import service.User;
 
-public class Login {
-    private final AuthDAO aDAO;
+public class Login extends Handler {
     private final UserDAO uDAO;
-    private final Gson serializer;
 
     public Login(UserDAO userDataAcc, AuthDAO authDataAcc) {
-        aDAO = authDataAcc;
+        super(authDataAcc);
         uDAO = userDataAcc;
-        serializer = new Gson();
     }
 
     public String run(String jsonRequest) throws JsonSyntaxException, InvalidAuthorizationException {

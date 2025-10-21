@@ -13,15 +13,12 @@ import dataaccess.interfaces.AuthDAO;
 
 import service.User;
 
-public class Registration {
-    private final AuthDAO aDAO;
+public class Registration extends Handler {
     private final UserDAO uDAO;
-    private final Gson serializer;
 
     public Registration(UserDAO userDataAcc, AuthDAO authDataAcc) {
-        aDAO = authDataAcc;
+        super(authDataAcc);
         uDAO = userDataAcc;
-        serializer = new Gson();
     }
 
     public String run(String jsonRequest) throws JsonSyntaxException, AlreadyTakenException {
