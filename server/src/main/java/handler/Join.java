@@ -22,7 +22,7 @@ public class Join extends Handler {
     public String run(String authToken, String jsonRequest) throws InvalidAuthorizationException, AlreadyTakenException {
         var gameService = new Game(aDAO, gDAO);
         JoinRequest request = serializer.fromJson(jsonRequest, JoinRequest.class);
-        JoinResult result = gameService.joinGame(authToken, request.playerColor(), request.gameID());
+        JoinResult result = gameService.joinGame(authToken, request);
         return serializer.toJson(result);
     }
 }
