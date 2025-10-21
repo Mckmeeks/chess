@@ -13,4 +13,8 @@ public class ListResult {
     public void add(GameData g) {
         games.add(new GameData(g.gameID(), g.wUsername(), g.bUsername(), g.gameName(), null));
     }
+
+    public ArrayList<GameData> getArray() {
+        return games;
+    }
 }
