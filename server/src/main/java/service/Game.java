@@ -44,19 +44,19 @@ public class Game {
     public JoinResult joinGame(String authToken, JoinRequest request) throws InvalidAuthorizationException, AlreadyTakenException {
         AuthData currentUser = aDAO.getAuth(authToken);
         if (currentUser == null) {throw new InvalidAuthorizationException("Error: unauthorized");}
-        GameData requestedGame = gDAO.getGame(request.gameID());
-        if (requestedGame == null) {throw new BadRequestException("Error: requested game does not exist");}
+        GameData reqGame = gDAO.getGame(request.gameID());
+        if (reqGame == null) {throw new BadRequestException("Error: requested game does not exist");}
         switch (request.playerColor()) {
             case "WHITE" -> {
-                if (requestedGame.whiteUsername() == null) {
-                    var tGame = new GameData(request.gameID(), currentUser.username(), requestedGame.blackUsername(), requestedGame.gameName(), requestedGame.game());
+                if (reqGame.whiteUsername() == null) {
+                    var tGame = new GameData(request.gameID(), currentUser.username(), reqGame.blackUsername(), reqGame.gameName(), reqGame.game());
                     gDAO.updateGame(request.gameID(), tGame);
                 }
                 else { throw new AlreadyTakenException("Error: color already taken"); }
             }
             case "BLACK" -> {
-                if (requestedGame.blackUsername() == null) {
-                    var tGame = new GameData(request.gameID(), requestedGame.whiteUsername(), currentUser.username(), requestedGame.gameName(), requestedGame.game());
+                if (reqGame.blackUsername() == null) {
+                    var tGame = new GameData(request.gameID(), reqGame.whiteUsername(), currentUser.username(), reqGame.gameName(), reqGame.game());
                     gDAO.updateGame(request.gameID(), tGame);
                 }
                 else { throw new AlreadyTakenException("Error: color already taken"); }

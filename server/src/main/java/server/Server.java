@@ -111,8 +111,5 @@ public class Server {
         aDAO = new MemoryAuthDAO();
         gDAO = new MemoryGameDAO();
     }
-//
-//    private void dbImplementation() {
-//        throw new NotImplementedError();
-//    }
+
 }
