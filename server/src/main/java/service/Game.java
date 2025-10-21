@@ -49,13 +49,15 @@ public class Game {
         switch (request.playerColor()) {
             case "WHITE" -> {
                 if (requestedGame.whiteUsername() == null) {
-                    gDAO.updateGame(request.gameID(), new GameData(request.gameID(), currentUser.username(), requestedGame.blackUsername(), requestedGame.gameName(), requestedGame.game()));
+                    var tGame = new GameData(request.gameID(), currentUser.username(), requestedGame.blackUsername(), requestedGame.gameName(), requestedGame.game());
+                    gDAO.updateGame(request.gameID(), tGame);
                 }
                 else { throw new AlreadyTakenException("Error: color already taken"); }
             }
             case "BLACK" -> {
                 if (requestedGame.blackUsername() == null) {
-                    gDAO.updateGame(request.gameID(), new GameData(request.gameID(), requestedGame.whiteUsername(), currentUser.username(), requestedGame.gameName(), requestedGame.game()));
+                    var tGame = new GameData(request.gameID(), requestedGame.whiteUsername(), currentUser.username(), requestedGame.gameName(), requestedGame.game());
+                    gDAO.updateGame(request.gameID(), tGame);
                 }
                 else { throw new AlreadyTakenException("Error: color already taken"); }
             }

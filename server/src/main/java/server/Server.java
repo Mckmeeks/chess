@@ -28,38 +28,38 @@ public class Server {
 
         // Register your endpoints and exception handlers here.
         javalin.post("/user", context -> {
-            var RegistrationHandler = new Registration(uDAO, aDAO);
-            String result = RegistrationHandler.run(context.body());
+            var registrationHandler = new Registration(uDAO, aDAO);
+            String result = registrationHandler.run(context.body());
             context.result(result);
         });
 
         javalin.post("/session", context -> {
-            var LoginHandler = new Login(uDAO, aDAO);
-            String result = LoginHandler.run(context.body());
+            var loginHandler = new Login(uDAO, aDAO);
+            String result = loginHandler.run(context.body());
             context.result(result);
         });
 
         javalin.delete("/session", context -> {
-            var LogoutHandler = new Logout(aDAO);
-            String result = LogoutHandler.run(context.header("Authorization"));
+            var logoutHandler = new Logout(aDAO);
+            String result = logoutHandler.run(context.header("Authorization"));
             context.result(result);
         });
 
         javalin.get("/game", context -> {
-            var ListHandler = new List(aDAO, gDAO);
-            String result = ListHandler.run(context.header("Authorization"));
+            var listHandler = new List(aDAO, gDAO);
+            String result = listHandler.run(context.header("Authorization"));
             context.result(result);
         });
 
         javalin.post("/game", context -> {
-            var CreateHandler = new Create(aDAO, gDAO);
-            String result = CreateHandler.run(context.header("Authorization"), context.body());
+            var createHandler = new Create(aDAO, gDAO);
+            String result = createHandler.run(context.header("Authorization"), context.body());
             context.result(result);
         });
 
         javalin.put("/game", context -> {
-            var JoinHandler = new Join(aDAO, gDAO);
-            String result = JoinHandler.run(context.header("Authorization"), context.body());
+            var joinHandler = new Join(aDAO, gDAO);
+            String result = joinHandler.run(context.header("Authorization"), context.body());
             context.result(result);
         });
 
@@ -94,7 +94,6 @@ public class Server {
             context.status(500);
             context.result("{\"message\": \"Error: (" + e.getMessage().replace("\"", "") + ")\"}");
             System.out.println(e.getMessage());
-            e.printStackTrace();
         });
     }
 
@@ -112,8 +111,8 @@ public class Server {
         aDAO = new MemoryAuthDAO();
         gDAO = new MemoryGameDAO();
     }
-
-    private void dbImplementation() {
-        throw new NotImplementedError();
-    }
+//
+//    private void dbImplementation() {
+//        throw new NotImplementedError();
+//    }
 }
