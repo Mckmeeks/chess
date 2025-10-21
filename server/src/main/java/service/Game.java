@@ -69,9 +69,4 @@ public class Game {
     private int makeNewID() {
         return gDAO.getLastID() + 1;
     }
-
-//    private String getUser(String user) {
-//        if (user == null) {return null;}
-//        else (user.isEmpty())
-//    }
 }
