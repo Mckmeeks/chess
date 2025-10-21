@@ -11,7 +11,7 @@ public class MemoryGameDAO implements GameDAO {
 
     public MemoryGameDAO() {
         gameDB = new Hashtable<>();
-        lastID = -1;
+        lastID = 0;
     }
 
     @Override
@@ -38,7 +38,7 @@ public class MemoryGameDAO implements GameDAO {
     @Override
     public void clear() {
         gameDB = new Hashtable<>();
-        lastID = -1;
+        lastID = 0;
     }
 
     @Override

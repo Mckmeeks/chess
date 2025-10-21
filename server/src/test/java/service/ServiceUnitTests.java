@@ -143,7 +143,7 @@ public class ServiceUnitTests {
         CreateRequest request = new CreateRequest("testGame");
         gameService.newGame(registerResult.authToken(), request);
         gameService.listGames(registerResult.authToken());
-        JoinRequest joinReq = new JoinRequest("white", 0);
+        JoinRequest joinReq = new JoinRequest("white", 1);
         assertThrows(BadRequestException.class, () -> gameService.joinGame(registerResult.authToken(), joinReq));
     }
 
