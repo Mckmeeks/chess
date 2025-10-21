@@ -3,6 +3,7 @@ package handler;
 import com.google.gson.JsonSyntaxException;
 import dataaccess.AlreadyTakenException;
 
+import dataaccess.BadRequestException;
 import handler.request.RegisterRequest;
 import service.result.RegisterResult;
 
@@ -22,9 +23,13 @@ public class Registration extends Handler {
     public String run(String jsonRequest) throws JsonSyntaxException, AlreadyTakenException {
         User userService = new User(uDAO, aDAO);
         RegisterRequest request = serializer.fromJson(jsonRequest, RegisterRequest.class);
-        if (request.username() == null) {throw new JsonSyntaxException("Error: Username not included");}
-        if (request.password() == null) {throw new JsonSyntaxException("Error: Password not included");}
+        checkArguments(request);
         RegisterResult result = userService.register(request);
         return serializer.toJson(result);
+    }
+
+    private void checkArguments(RegisterRequest request) throws BadRequestException {
+        if (request.username() == null) {throw new JsonSyntaxException("Error: Username not included");}
+        if (request.password() == null) {throw new JsonSyntaxException("Error: Password not included");}
     }
 }

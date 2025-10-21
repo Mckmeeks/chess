@@ -12,6 +12,8 @@ import handler.*;
 import kotlin.NotImplementedError;
 import service.DeleteDB;
 
+import java.util.Arrays;
+
 public class Server {
 
     private final Javalin javalin;
@@ -92,6 +94,7 @@ public class Server {
             context.status(500);
             context.result("{\"message\": \"Error: (" + e.getMessage().replace("\"", "") + ")\"}");
             System.out.println(e.getMessage());
+            e.printStackTrace();
         });
     }
 

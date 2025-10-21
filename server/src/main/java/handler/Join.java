@@ -1,6 +1,7 @@
 package handler;
 
 import dataaccess.AlreadyTakenException;
+import dataaccess.BadRequestException;
 import dataaccess.InvalidAuthorizationException;
 
 import dataaccess.interfaces.AuthDAO;
@@ -19,10 +20,15 @@ public class Join extends Handler {
         gDAO = gameDataAcc;
     }
 
-    public String run(String authToken, String jsonRequest) throws InvalidAuthorizationException, AlreadyTakenException {
+    public String run(String authToken, String jsonRequest) throws InvalidAuthorizationException, AlreadyTakenException, BadRequestException {
         var gameService = new Game(aDAO, gDAO);
         JoinRequest request = serializer.fromJson(jsonRequest, JoinRequest.class);
+        checkArguments(request);
         JoinResult result = gameService.joinGame(authToken, request);
         return serializer.toJson(result);
+    }
+
+    private void checkArguments(JoinRequest request) throws BadRequestException {
+        if (request.playerColor() == null) {throw new BadRequestException("Error: bad request");}
     }
 }

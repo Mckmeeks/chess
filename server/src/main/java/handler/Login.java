@@ -1,7 +1,6 @@
 package handler;
 
-import com.google.gson.JsonSyntaxException;
-
+import dataaccess.BadRequestException;
 import dataaccess.InvalidAuthorizationException;
 
 import handler.request.LoginRequest;
@@ -20,12 +19,16 @@ public class Login extends Handler {
         uDAO = userDataAcc;
     }
 
-    public String run(String jsonRequest) throws JsonSyntaxException, InvalidAuthorizationException {
+    public String run(String jsonRequest) throws InvalidAuthorizationException {
         User userService = new User(uDAO, aDAO);
         LoginRequest request = serializer.fromJson(jsonRequest, LoginRequest.class);
-        if (request.username() == null) {throw new JsonSyntaxException("Error: username not included");}
-        if (request.password() == null) {throw new JsonSyntaxException("Error: password not included");}
+        checkArguments(request);
         LoginResult result = userService.login(request);
         return serializer.toJson(result);
+    }
+
+    private void checkArguments(LoginRequest request) throws BadRequestException {
+        if (request.username() == null) {throw new BadRequestException("Error: username not included");}
+        if (request.password() == null) {throw new BadRequestException("Error: password not included");}
     }
 }
