@@ -15,6 +15,7 @@ import service.DeleteDB;
 public class Server {
 
     private final Javalin javalin;
+
     private UserDAO uDAO;
     private AuthDAO aDAO;
     private GameDAO gDAO;
@@ -68,6 +69,11 @@ public class Server {
 
 
         javalin.exception(JsonSyntaxException.class, (e, context) -> {
+            context.status(400);
+            context.result("{\"message\": \"Error: bad request\"}");
+        });
+
+        javalin.exception(BadRequestException.class, (e, context) -> {
             context.status(400);
             context.result("{\"message\": \"Error: bad request\"}");
         });
