@@ -8,4 +8,5 @@ public interface AuthDAO {
     AuthData getAuth(String token);
     void deleteAuth(String token) throws InvalidAuthorizationException;
     void clear();
+    int getSize();
 }

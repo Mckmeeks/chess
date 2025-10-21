@@ -3,6 +3,7 @@ package dataaccess.interfaces;
 import model.GameData;
 
 public interface GameDAO {
+
     void createGame(GameData game);
     GameData getGame(int gameID);
     GameData[] listGames();
@@ -11,4 +12,5 @@ public interface GameDAO {
     void updateGame(int gameID, GameData game);
     void clear();
     int getLastID();
+    int getSize();
 }

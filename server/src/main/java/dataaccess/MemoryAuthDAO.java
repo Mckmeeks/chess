@@ -34,5 +34,10 @@ public class MemoryAuthDAO implements AuthDAO{
     public void clear() {
         authDataDB = new Hashtable<>();
     }
+
+    @Override
+    public int getSize() {
+        return authDataDB.size();
+    }
 }
 

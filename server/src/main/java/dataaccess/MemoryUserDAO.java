@@ -27,4 +27,9 @@ public class MemoryUserDAO implements UserDAO {
     public void clear() {
         userDB = new Hashtable<>();
     }
+
+    @Override
+    public int getSize() {
+        return userDB.size();
+    }
 }

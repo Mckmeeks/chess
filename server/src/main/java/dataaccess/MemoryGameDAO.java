@@ -7,10 +7,11 @@ import model.GameData;
 
 public class MemoryGameDAO implements GameDAO {
     private Hashtable<Integer, GameData> gameDB;
-    private int lastID = 0;
+    private int lastID;
 
     public MemoryGameDAO() {
         gameDB = new Hashtable<>();
+        lastID = -1;
     }
 
     @Override
@@ -37,8 +38,14 @@ public class MemoryGameDAO implements GameDAO {
     @Override
     public void clear() {
         gameDB = new Hashtable<>();
+        lastID = -1;
     }
 
     @Override
     public int getLastID() { return lastID;}
+
+    @Override
+    public int getSize() {
+        return gameDB.size();
+    }
 }

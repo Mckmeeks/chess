@@ -8,4 +8,5 @@ public interface UserDAO {
     void createUser(UserData u) throws AlreadyTakenException;
     UserData getUser(String username);
     void clear();
+    int getSize();
 }
