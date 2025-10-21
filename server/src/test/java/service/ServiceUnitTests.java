@@ -130,7 +130,7 @@ public class ServiceUnitTests {
         CreateRequest request = new CreateRequest("testGame");
         gameService.newGame(registerResult.authToken(), request);
 
-        JoinRequest joinReq = new JoinRequest("WHITE", 0);
+        JoinRequest joinReq = new JoinRequest("WHITE", 1);
         gameService.joinGame(registerResult.authToken(), joinReq);
         var game = gDAO.getGame(joinReq.gameID());
         assertEquals("TestUser", game.wUsername());
