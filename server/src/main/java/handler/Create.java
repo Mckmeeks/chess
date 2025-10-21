@@ -5,6 +5,7 @@ import dataaccess.InvalidAuthorizationException;
 import dataaccess.interfaces.AuthDAO;
 import dataaccess.interfaces.GameDAO;
 
+import handler.request.CreateRequest;
 import service.Game;
 
 import service.result.NewGameResult;
@@ -19,7 +20,7 @@ public class Create extends Handler {
 
     public String run(String authToken, String gameName) throws InvalidAuthorizationException {
         var gameService = new Game(aDAO, gDAO);
-        NewGameResult result = gameService.newGame(authToken, gameName);
+        NewGameResult result = gameService.newGame(authToken,  serializer.fromJson(gameName, CreateRequest.class));
         return serializer.toJson(result);
     }
 }
