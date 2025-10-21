@@ -37,7 +37,7 @@ public class Game {
         if (aDAO.getAuth(authToken) == null) {throw new InvalidAuthorizationException("Error: unauthorized");}
         int newID = makeNewID();
         if (request.gameName().isEmpty()) {throw new BadRequestException("Error: game name not provided");}
-        gDAO.createGame(new GameData(newID, "", "", request.gameName(), new ChessGame()));
+        gDAO.createGame(new GameData(newID, null, null, request.gameName(), new ChessGame()));
         return new NewGameResult(newID);
     }
 
@@ -48,14 +48,14 @@ public class Game {
         if (requestedGame == null) {throw new BadRequestException("Error: requested game does not exist");}
         switch (request.playerColor()) {
             case "WHITE" -> {
-                if (requestedGame.wUsername().isEmpty()) {
-                    gDAO.updateGame(request.gameID(), new GameData(request.gameID(), currentUser.username(), requestedGame.bUsername(), requestedGame.gameName(), requestedGame.game()));
+                if (requestedGame.whiteUsername() == null) {
+                    gDAO.updateGame(request.gameID(), new GameData(request.gameID(), currentUser.username(), requestedGame.blackUsername(), requestedGame.gameName(), requestedGame.game()));
                 }
                 else { throw new AlreadyTakenException("Error: color already taken"); }
             }
             case "BLACK" -> {
-                if (requestedGame.bUsername().isEmpty()) {
-                    gDAO.updateGame(request.gameID(), new GameData(request.gameID(), requestedGame.wUsername(), currentUser.username(), requestedGame.gameName(), requestedGame.game()));
+                if (requestedGame.blackUsername() == null) {
+                    gDAO.updateGame(request.gameID(), new GameData(request.gameID(), requestedGame.whiteUsername(), currentUser.username(), requestedGame.gameName(), requestedGame.game()));
                 }
                 else { throw new AlreadyTakenException("Error: color already taken"); }
             }
@@ -69,4 +69,9 @@ public class Game {
     private int makeNewID() {
         return gDAO.getLastID() + 1;
     }
+
+//    private String getUser(String user) {
+//        if (user == null) {return null;}
+//        else (user.isEmpty())
+//    }
 }
