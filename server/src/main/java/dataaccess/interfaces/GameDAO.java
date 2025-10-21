@@ -10,4 +10,5 @@ public interface GameDAO {
 //    void updateGame(int gameID, ChessMove move) throws DataAccessException;
     void updateGame(int gameID, GameData game);
     void clear();
+    int getLastID();
 }
