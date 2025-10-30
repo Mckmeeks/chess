@@ -1,9 +1,12 @@
 package dataaccess;
 
+import chess.ChessGame;
+import com.google.gson.Gson;
 import dataaccess.interfaces.AuthDAO;
 import dataaccess.interfaces.GameDAO;
 import dataaccess.interfaces.UserDAO;
 import model.AuthData;
+import model.GameData;
 import model.UserData;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,14 +29,19 @@ public class DataaccessTests {
 
     private static UserData user;
     private static AuthData auth;
+    private static GameData game;
+
+    static Gson serializer;
 
     @BeforeAll
     static void setUP() throws DataAccessException {
         uDAO = new MySqlUserDAO();
         aDAO = new MySqlAuthDAO();
-//            gDAO = new MemoryGameDAO();
+        gDAO = new MySqlGameDAO();
         user = new UserData("testUser", "testPassword", "");
         auth = new AuthData("fakeAuthTokenYippee", "testUser");
+        game = new GameData(1, "white", "black", "bond and free", new ChessGame());
+        serializer = new Gson();
     }
 
     @BeforeEach
@@ -41,11 +49,10 @@ public class DataaccessTests {
         try {
             uDAO.clear();
             aDAO.clear();
+            gDAO.clear();
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
         }
-//            aDAO.clear();
-//            gDAO.clear();
     }
 
     @Test
@@ -86,6 +93,7 @@ public class DataaccessTests {
     public void positiveGetUserSizeNone() throws DataAccessException {
         assertEquals(0, uDAO.getSize());
     }
+
 
     @Test
     public void positiveCreateAuth() throws DataAccessException {
@@ -136,6 +144,69 @@ public class DataaccessTests {
     }
 
 
+    @Test
+    public void positiveCreateGame() throws DataAccessException {
+        gDAO.createGame(game);
+        String retrieveStat = "SELECT gameID, wUser, bUser, gName, gData FROM game WHERE gameID='" + game.gameID() + "';";
+        var response = sendQueryCommand(retrieveStat, new Object[][]{{"gameID", 1}, {"wUser", "s"}, {"bUser", "s"}, {"gName", "s"}, {"gData", "s"}});
+        var gameObject = serializer.fromJson((String)response.get(4), ChessGame.class);
+        GameData retroGame = new GameData((int)response.get(0), (String)response.get(1), (String)response.get(2), (String)response.get(3), gameObject);
+        assertEquals(game, retroGame);
+    }
+
+    @Test
+    public void negativeCreateGame() throws DataAccessException {
+        gDAO.createGame(game);
+        assertThrows(DataAccessException.class, () -> gDAO.createGame(game));
+    }
+
+    @Test
+    public void positiveGetGame() throws DataAccessException {
+        gDAO.createGame(game);
+        assertEquals(game, gDAO.getGame(game.gameID()));
+    }
+
+    @Test
+    public void negativeGetGame() throws DataAccessException {
+        gDAO.createGame(game);
+        assertNull(gDAO.getGame(-100));
+    }
+
+    @Test
+    public void positiveGetSize() throws DataAccessException {
+        gDAO.createGame(game);
+        gDAO.createGame(new GameData(2,"","","cheese", new ChessGame()));
+        assertEquals(2, gDAO.getSize());
+    }
+
+    @Test
+    public void emptyGetSize() throws DataAccessException {
+        gDAO.clear();
+        assertEquals(0, gDAO.getSize());
+    }
+
+    @Test
+    public void positiveListGames() throws DataAccessException {
+        gDAO.createGame(game);
+        gDAO.createGame(new GameData(2,"","","cheese", new ChessGame()));
+        assertEquals(gDAO.listGames().length, gDAO.getSize());
+    }
+
+    @Test
+    public void emptyListGames() throws DataAccessException {
+        gDAO.clear();
+        assertEquals(0, gDAO.listGames().length);
+    }
+
+    @Test
+    public void positiveUpdateGame() throws DataAccessException {
+        gDAO.createGame(game);
+        var newGame = new GameData(1, "new", "New", game.gameName(), new ChessGame());
+        gDAO.updateGame(1, newGame);
+        GameData retroGame = gDAO.getGame(1);
+        assertEquals(newGame, retroGame);
+    }
+
 //        @Test
 //        void positiveClear() {
 //
@@ -150,7 +221,7 @@ public class DataaccessTests {
                 for (int i = 1; i <= params.length; i++) {
                     var par = params[i - 1];
                     if (par[1] instanceof String _) {collect.add(response.getString((String)par[0]));}
-                    else if (par[1] instanceof Integer _) {collect.add(response.getInt((Integer)par[0]));}
+                    else if (par[1] instanceof Integer _) {collect.add(response.getInt((String)par[0]));}
                 }
             }
             return collect;

@@ -69,7 +69,7 @@ public class Game {
         return new JoinResult();
     }
 
-    private int makeNewID() {
+    private int makeNewID() throws DataAccessException {
         return gDAO.getLastID() + 1;
     }
 }

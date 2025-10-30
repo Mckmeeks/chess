@@ -41,10 +41,10 @@ public class ServiceUnitTests {
         try {
             uDAO.clear();
             aDAO.clear();
+            gDAO.clear();
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
         }
-        gDAO.clear();
     }
 
     static RegisterResult register() throws AlreadyTakenException, DataAccessException {

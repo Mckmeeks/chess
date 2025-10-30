@@ -1,6 +1,7 @@
 package dataaccess;
 
 import dataaccess.interfaces.AuthDAO;
+import handler.request.CreateRequest;
 import model.AuthData;
 import model.UserData;
 
@@ -9,8 +10,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class MySqlAuthDAO implements AuthDAO {
+
     public MySqlAuthDAO() throws DataAccessException {
-        String[] createUserTableStatement = {
+        String[] createAuthTableStatement = {
                 """
         CREATE TABLE IF NOT EXISTS auth (
           token varchar(50) NOT NULL UNIQUE,
@@ -19,7 +21,7 @@ public class MySqlAuthDAO implements AuthDAO {
         );
         """
         };
-        configureDatabase(createUserTableStatement);
+        configureDatabase(createAuthTableStatement);
     }
     @Override
     public boolean createAuth(AuthData a) throws DataAccessException {

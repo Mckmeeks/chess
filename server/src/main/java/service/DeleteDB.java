@@ -16,13 +16,13 @@ public class DeleteDB {
         gDAO = gameDataAcc;
     }
 
-    public void clear() {
+    public void clear(){
         try {
             uDAO.clear();
             aDAO.clear();
+            gDAO.clear();
         } catch (dataaccess.DataAccessException e) {
             throw new RuntimeException(e);
         }
-        gDAO.clear();
     }
 }
