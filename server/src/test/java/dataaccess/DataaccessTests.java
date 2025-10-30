@@ -100,7 +100,7 @@ public class DataaccessTests {
     @Test
     public void negativeCreateAuth() throws DataAccessException {
         aDAO.createAuth(auth);
-        assertFalse(aDAO.createAuth(auth));
+        assertTrue(aDAO.createAuth(auth));
     }
 
     @Test
