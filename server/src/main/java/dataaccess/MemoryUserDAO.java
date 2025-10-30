@@ -5,6 +5,8 @@ import java.util.Hashtable;
 import dataaccess.interfaces.UserDAO;
 import model.UserData;
 
+import javax.xml.crypto.Data;
+
 public class MemoryUserDAO implements UserDAO {
     private Hashtable<String, UserData> userDB;
 
@@ -24,7 +26,7 @@ public class MemoryUserDAO implements UserDAO {
     }
 
     @Override
-    public void clear() {
+    public void clear() throws DataAccessException {
         userDB = new Hashtable<>();
     }
 

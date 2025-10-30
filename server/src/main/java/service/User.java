@@ -2,6 +2,7 @@ package service;
 
 import java.util.UUID;
 
+import dataaccess.DataAccessException;
 import dataaccess.InvalidAuthorizationException;
 import dataaccess.interfaces.UserDAO;
 import dataaccess.interfaces.AuthDAO;
@@ -28,13 +29,13 @@ public class User {
         aDAO = authDataAcc;
     }
 
-    public RegisterResult register(RegisterRequest request) throws AlreadyTakenException {
+    public RegisterResult register(RegisterRequest request) throws AlreadyTakenException, DataAccessException {
         uDAO.createUser(new UserData(request.username(), request.password(), request.email()));
         AuthData data = createAuthData(request.username());
         return new RegisterResult(data.username(), data.authToken());
     }
 
-    public LoginResult login(LoginRequest request) throws InvalidAuthorizationException {
+    public LoginResult login(LoginRequest request) throws InvalidAuthorizationException, DataAccessException {
         UserData userData = uDAO.getUser(request.username());
         if (userData == null) {throw new InvalidAuthorizationException("Error: unauthorized");}
         if (!userData.password().equals(request.password())) {throw new InvalidAuthorizationException("Error: unauthorized");}

@@ -25,6 +25,7 @@ public class Server {
     public Server() {
         javalin = Javalin.create(config -> config.staticFiles.add("web"));
         memoryImplementation();
+        mySqlImplementation();
 
         // Register your endpoints and exception handlers here.
         javalin.post("/user", context -> {
@@ -90,6 +91,12 @@ public class Server {
             context.result("{\"message\": \"Error: username already taken\"}");
         });
 
+        javalin.exception(DataAccessException.class, (e, context) -> {
+            context.status(500);
+            context.result("{\"message\": \"Error: (" + e.getMessage().replace("\"", "") + ")\"}");
+            System.out.println(e.getMessage());
+        });
+
         javalin.exception(Exception.class, (e, context) -> {
             context.status(500);
             context.result("{\"message\": \"Error: (" + e.getMessage().replace("\"", "") + ")\"}");
@@ -112,4 +119,11 @@ public class Server {
         gDAO = new MemoryGameDAO();
     }
 
+    private void mySqlImplementation() {
+        try {
+            uDAO = new MySqlUserDAO();
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+        }
+    }
 }

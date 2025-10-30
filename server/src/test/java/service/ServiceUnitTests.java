@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Test;
 import dataaccess.*;
 import dataaccess.interfaces.*;
 
-import model.*;
 import handler.request.*;
 import service.result.*;
 
@@ -28,26 +27,30 @@ public class ServiceUnitTests {
 
     @BeforeEach
     void clear() {
-        uDAO.clear();
+        try {
+            uDAO.clear();
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
         aDAO.clear();
         gDAO.clear();
     }
 
-    static RegisterResult register() throws AlreadyTakenException {
+    static RegisterResult register() throws AlreadyTakenException, DataAccessException {
         var request = new RegisterRequest("TestUser", "pass","");
         User userService = new User(uDAO, aDAO);
         return userService.register(request);
     }
 
     @Test
-    void positiveRegister() throws AlreadyTakenException{
+    void positiveRegister() throws AlreadyTakenException, DataAccessException {
         var response = register();
         assertEquals("TestUser", response.username());
         assertNotNull(response.authToken());
     }
 
     @Test
-    void negativeRegisterTwice() throws AlreadyTakenException {
+    void negativeRegisterTwice() throws AlreadyTakenException, DataAccessException {
         register();
         var request = new RegisterRequest("TestUser", "letMeIn","not.your@cheese.com");
         User userService = new User(uDAO, aDAO);
@@ -55,7 +58,7 @@ public class ServiceUnitTests {
     }
 
     @Test
-    void positiveLogin() throws InvalidAuthorizationException, AlreadyTakenException {
+    void positiveLogin() throws InvalidAuthorizationException, AlreadyTakenException, DataAccessException {
         register();
         var request = new LoginRequest("TestUser", "pass");
         User userService = new User(uDAO, aDAO);
@@ -65,7 +68,7 @@ public class ServiceUnitTests {
     }
 
     @Test
-    void negativeLoginInvalid() throws AlreadyTakenException {
+    void negativeLoginInvalid() throws AlreadyTakenException, DataAccessException {
         var request = new LoginRequest("TestUser", "pass");
         User userService = new User(uDAO, aDAO);
         assertThrows(InvalidAuthorizationException.class, () -> userService.login(request));
@@ -75,7 +78,7 @@ public class ServiceUnitTests {
     }
 
     @Test
-    void positiveLogout() throws InvalidAuthorizationException, AlreadyTakenException {
+    void positiveLogout() throws InvalidAuthorizationException, AlreadyTakenException, DataAccessException {
         var registerResult = register();
         assertNotNull(aDAO.getAuth(registerResult.authToken()));
         User userService = new User(uDAO, aDAO);
@@ -90,7 +93,7 @@ public class ServiceUnitTests {
     }
 
     @Test
-    void positiveNewGame() throws InvalidAuthorizationException, AlreadyTakenException {
+    void positiveNewGame() throws InvalidAuthorizationException, AlreadyTakenException, DataAccessException {
         var registerResult = register();
         Game gameService = new Game(aDAO, gDAO);
         CreateRequest request = new CreateRequest("testGame");
@@ -99,7 +102,7 @@ public class ServiceUnitTests {
     }
 
     @Test
-    void negativeNewGame() throws AlreadyTakenException {
+    void negativeNewGame() throws AlreadyTakenException, DataAccessException {
         var registerResult = register();
         Game gameService = new Game(aDAO, gDAO);
         CreateRequest request = new CreateRequest("");
@@ -107,7 +110,7 @@ public class ServiceUnitTests {
     }
 
     @Test
-    void positiveListGames() throws InvalidAuthorizationException, AlreadyTakenException {
+    void positiveListGames() throws InvalidAuthorizationException, AlreadyTakenException, DataAccessException {
         var registerResult = register();
         Game gameService = new Game(aDAO, gDAO);
         CreateRequest request = new CreateRequest("testGame");
@@ -124,7 +127,7 @@ public class ServiceUnitTests {
     }
 
     @Test
-    void positiveJoinResult() throws InvalidAuthorizationException, AlreadyTakenException, BadRequestResponse {
+    void positiveJoinResult() throws InvalidAuthorizationException, AlreadyTakenException, BadRequestResponse, DataAccessException {
         var registerResult = register();
         Game gameService = new Game(aDAO, gDAO);
         CreateRequest request = new CreateRequest("testGame");
@@ -137,7 +140,7 @@ public class ServiceUnitTests {
     }
 
     @Test
-    void negativeJoinResult() throws InvalidAuthorizationException, AlreadyTakenException {
+    void negativeJoinResult() throws InvalidAuthorizationException, AlreadyTakenException, DataAccessException {
         var registerResult = register();
         Game gameService = new Game(aDAO, gDAO);
         CreateRequest request = new CreateRequest("testGame");
@@ -148,7 +151,7 @@ public class ServiceUnitTests {
     }
 
     @Test
-    void positiveClear() throws InvalidAuthorizationException, AlreadyTakenException {
+    void positiveClear() throws InvalidAuthorizationException, AlreadyTakenException, DataAccessException {
         positiveJoinResult();
         DeleteDB dataService = new DeleteDB(uDAO, aDAO, gDAO);
         dataService.clear();

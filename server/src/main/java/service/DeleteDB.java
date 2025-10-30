@@ -16,7 +16,11 @@ public class DeleteDB {
     }
 
     public void clear() {
-        uDAO.clear();
+        try {
+            uDAO.clear();
+        } catch (dataaccess.DataAccessException e) {
+            throw new RuntimeException(e);
+        }
         aDAO.clear();
         gDAO.clear();
     }
