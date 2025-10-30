@@ -2,6 +2,7 @@ package handler;
 
 import dataaccess.AlreadyTakenException;
 import dataaccess.BadRequestException;
+import dataaccess.DataAccessException;
 import dataaccess.InvalidAuthorizationException;
 
 import dataaccess.interfaces.AuthDAO;
@@ -20,7 +21,7 @@ public class Join extends Handler {
         gDAO = gameDataAcc;
     }
 
-    public String run(String authToken, String jsonRequest) throws InvalidAuthorizationException, AlreadyTakenException, BadRequestException {
+    public String run(String authToken, String jsonRequest) throws InvalidAuthorizationException, AlreadyTakenException, BadRequestException, DataAccessException {
         var gameService = new Game(aDAO, gDAO);
         JoinRequest request = serializer.fromJson(jsonRequest, JoinRequest.class);
         checkArguments(request);

@@ -43,12 +43,12 @@ public class User {
         return new LoginResult(data.username(), data.authToken());
     }
 
-    public LogoutResult logout(String request) throws InvalidAuthorizationException {
+    public LogoutResult logout(String request) throws InvalidAuthorizationException, DataAccessException {
         aDAO.deleteAuth(request);
         return new LogoutResult();
     }
 
-    private AuthData createAuthData(String username) {
+    private AuthData createAuthData(String username) throws DataAccessException {
         boolean needed = true;
         AuthData data = null;
         while (needed) {

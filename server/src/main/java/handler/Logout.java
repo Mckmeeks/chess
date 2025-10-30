@@ -1,5 +1,6 @@
 package handler;
 
+import dataaccess.DataAccessException;
 import dataaccess.InvalidAuthorizationException;
 
 import dataaccess.interfaces.AuthDAO;
@@ -14,7 +15,7 @@ public class Logout extends Handler {
         super(authDataAcc);
     }
 
-    public String run(String authToken) throws InvalidAuthorizationException {
+    public String run(String authToken) throws InvalidAuthorizationException, DataAccessException {
         User userService = new User(null, aDAO);
         LogoutResult result = userService.logout(authToken);
         return serializer.toJson(result);

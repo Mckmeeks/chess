@@ -1,5 +1,6 @@
 package service;
 
+import dataaccess.DataAccessException;
 import dataaccess.interfaces.AuthDAO;
 import dataaccess.interfaces.GameDAO;
 import dataaccess.interfaces.UserDAO;
@@ -18,10 +19,10 @@ public class DeleteDB {
     public void clear() {
         try {
             uDAO.clear();
+            aDAO.clear();
         } catch (dataaccess.DataAccessException e) {
             throw new RuntimeException(e);
         }
-        aDAO.clear();
         gDAO.clear();
     }
 }

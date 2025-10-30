@@ -1,5 +1,6 @@
 package handler;
 
+import dataaccess.DataAccessException;
 import dataaccess.InvalidAuthorizationException;
 
 import dataaccess.interfaces.AuthDAO;
@@ -17,7 +18,7 @@ public class List extends Handler {
         gDAO = gameDataAcc;
     }
 
-    public String run(String authToken) throws InvalidAuthorizationException {
+    public String run(String authToken) throws InvalidAuthorizationException, DataAccessException {
         var gameService = new Game(aDAO, gDAO);
         ListResult result = gameService.listGames(authToken);
         return serializer.toJson(result);

@@ -19,20 +19,31 @@ public class ServiceUnitTests {
     private static GameDAO gDAO;
 
     @BeforeAll
-    static void setUP() {
+    static void setUP() throws DataAccessException {
+        MySqlSetUp();
+    }
+
+    static void memorySetUp() {
         uDAO = new MemoryUserDAO();
         aDAO = new MemoryAuthDAO();
         gDAO = new MemoryGameDAO();
     }
 
+    static void MySqlSetUp() throws DataAccessException {
+        uDAO = new MySqlUserDAO();
+        aDAO = new MySqlAuthDAO();
+        gDAO = new MemoryGameDAO();
+    }
+
+
     @BeforeEach
     void clear() {
         try {
             uDAO.clear();
+            aDAO.clear();
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
         }
-        aDAO.clear();
         gDAO.clear();
     }
 
