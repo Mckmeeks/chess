@@ -111,9 +111,10 @@ public class Server {
 
     private void mySqlImplementation() {
         try {
-            uDAO = new MySqlUserDAO();
-            aDAO = new MySqlAuthDAO();
-            gDAO = new MySqlGameDAO();
+            dataaccess.MySqlDAO overDAO = new MySqlDAO();
+            uDAO = overDAO.getUserDAO();
+            aDAO = overDAO.getAuthDAO();
+            gDAO = overDAO.getGameDAO();
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
         }

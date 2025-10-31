@@ -1,14 +1,17 @@
 package dataaccess;
 
 import chess.ChessGame;
+
 import com.google.gson.Gson;
+import org.mindrot.jbcrypt.BCrypt;
+
 import dataaccess.interfaces.AuthDAO;
 import dataaccess.interfaces.GameDAO;
 import dataaccess.interfaces.UserDAO;
+
 import model.AuthData;
 import model.GameData;
 import model.UserData;
-import org.mindrot.jbcrypt.BCrypt;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
