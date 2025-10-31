@@ -24,9 +24,10 @@ public class ServiceUnitTests {
     }
 
     static void mySqlSetUp() throws DataAccessException {
-        uDAO = new MySqlUserDAO();
-        aDAO = new MySqlAuthDAO();
-        gDAO = new MySqlGameDAO();
+        dataaccess.MySqlDAO overDAO = new MySqlDAO();
+        uDAO = overDAO.getUserDAO();
+        aDAO = overDAO.getAuthDAO();
+        gDAO = overDAO.getGameDAO();
     }
 
 

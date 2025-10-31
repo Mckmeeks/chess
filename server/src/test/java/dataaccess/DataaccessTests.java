@@ -32,9 +32,11 @@ public class DataaccessTests {
 
     @BeforeAll
     static void setUP() throws DataAccessException {
-        uDAO = new MySqlUserDAO();
-        aDAO = new MySqlAuthDAO();
-        gDAO = new MySqlGameDAO();
+        dataaccess.MySqlDAO overDAO = new MySqlDAO();
+        uDAO = overDAO.getUserDAO();
+        aDAO = overDAO.getAuthDAO();
+        gDAO = overDAO.getGameDAO();
+
         user = new UserData("testUser", "testPassword", "");
         auth = new AuthData("fakeAuthTokenYippee", "testUser");
         game = new GameData(1, "white", "black", "bond and free", new ChessGame());
