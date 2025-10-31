@@ -1,24 +1,22 @@
 package dataaccess;
 
-import chess.ChessGame;
-import com.google.gson.Gson;
-import dataaccess.interfaces.AuthDAO;
-import dataaccess.interfaces.GameDAO;
-import dataaccess.interfaces.UserDAO;
-import model.AuthData;
-import model.GameData;
-import model.UserData;
-
+import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
 import org.mindrot.jbcrypt.BCrypt;
+import com.google.gson.Gson;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-import static org.junit.jupiter.api.Assertions.*;
+import chess.ChessGame;
+
+import dataaccess.interfaces.*;
+
+import model.*;
 
 public class DataaccessTests {
 

@@ -6,8 +6,6 @@ import dataaccess.interfaces.UserDAO;
 import model.UserData;
 import org.mindrot.jbcrypt.BCrypt;
 
-import javax.xml.crypto.Data;
-
 public class MemoryUserDAO implements UserDAO {
     private Hashtable<String, UserData> userDB;
 
