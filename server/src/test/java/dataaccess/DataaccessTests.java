@@ -149,7 +149,8 @@ public class DataaccessTests {
         String retrieveStat = "SELECT gameID, wUser, bUser, gName, gData FROM game WHERE gameID='" + game.gameID() + "';";
         var response = sendQueryCommand(retrieveStat, new Object[][]{{"gameID", 1}, {"wUser", "s"}, {"bUser", "s"}, {"gName", "s"}, {"gData", "s"}});
         var gameObject = serializer.fromJson((String)response.get(4), ChessGame.class);
-        GameData retroGame = new GameData((int)response.get(0), (String)response.get(1), (String)response.get(2), (String)response.get(3), gameObject);
+        var retroID = (int)response.get(0);
+        GameData retroGame = new GameData(retroID, (String)response.get(1), (String)response.get(2), (String)response.get(3), gameObject);
         assertEquals(game, retroGame);
     }
 
