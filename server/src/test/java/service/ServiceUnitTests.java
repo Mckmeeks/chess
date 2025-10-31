@@ -21,6 +21,7 @@ public class ServiceUnitTests {
     @BeforeAll
     static void setUP() throws DataAccessException {
         MySqlSetUp();
+//        memorySetUp();
     }
 
     static void memorySetUp() {
@@ -32,7 +33,7 @@ public class ServiceUnitTests {
     static void MySqlSetUp() throws DataAccessException {
         uDAO = new MySqlUserDAO();
         aDAO = new MySqlAuthDAO();
-        gDAO = new MemoryGameDAO();
+        gDAO = new MySqlGameDAO();
     }
 
 

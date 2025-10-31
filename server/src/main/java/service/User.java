@@ -10,6 +10,7 @@ import dataaccess.interfaces.AuthDAO;
 import dataaccess.AlreadyTakenException;
 
 import handler.request.RegisterRequest;
+import org.mindrot.jbcrypt.BCrypt;
 import service.result.RegisterResult;
 
 import handler.request.LoginRequest;
@@ -38,7 +39,7 @@ public class User {
     public LoginResult login(LoginRequest request) throws InvalidAuthorizationException, DataAccessException {
         UserData userData = uDAO.getUser(request.username());
         if (userData == null) {throw new InvalidAuthorizationException("Error: unauthorized");}
-        if (!userData.password().equals(request.password())) {throw new InvalidAuthorizationException("Error: unauthorized");}
+        if (!compEncPass(request.password(), userData.password())) {throw new InvalidAuthorizationException("Error: unauthorized");}
         AuthData data = createAuthData(request.username());
         return new LoginResult(data.username(), data.authToken());
     }
@@ -60,5 +61,9 @@ public class User {
 
     private String generateAuthToken() {
         return UUID.randomUUID().toString();
+    }
+
+    private boolean compEncPass(String plain, String enc) {
+        return BCrypt.checkpw(plain, enc);
     }
 }

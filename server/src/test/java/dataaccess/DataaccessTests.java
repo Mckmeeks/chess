@@ -8,16 +8,15 @@ import dataaccess.interfaces.UserDAO;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mindrot.jbcrypt.BCrypt;
 
-import javax.xml.crypto.Data;
-import java.sql.Array;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -61,7 +60,7 @@ public class DataaccessTests {
         String retrieveStat = "SELECT name, pass, email FROM user WHERE name='" + user.username() + "';";
         var response = sendQueryCommand(retrieveStat, new Object[][]{{"name", "s"}, {"pass", "s"}, {"email", "s"}});
         UserData retroUser = new UserData((String)response.get(0), (String)response.get(1), (String)response.get(2));
-        assertEquals(user, retroUser);
+        compareUserEnc(user, retroUser);
     }
 
     @Test
@@ -73,7 +72,7 @@ public class DataaccessTests {
     @Test
     public void positiveGetUser() throws DataAccessException {
         uDAO.createUser(user);
-        assertEquals(user, uDAO.getUser(user.username()));
+        compareUserEnc(user, uDAO.getUser(user.username()));
     }
 
     @Test
@@ -207,10 +206,35 @@ public class DataaccessTests {
         assertEquals(newGame, retroGame);
     }
 
-//        @Test
-//        void positiveClear() {
-//
-//        }
+    @Test
+    public void negativeUpdateGame() throws DataAccessException {
+        gDAO.createGame(game);
+        assertThrows(DataAccessException.class, () -> gDAO.updateGame(4, game));
+    }
+
+    @Test
+    public void positiveGetLastID() throws DataAccessException {
+        gDAO.createGame(game);
+        gDAO.createGame(new GameData(5, "", "", "", new ChessGame()));
+        assertEquals(5, gDAO.getLastID());
+    }
+
+    @Test
+    void positiveClear() throws DataAccessException {
+        uDAO.createUser(user);
+        aDAO.createAuth(auth);
+        gDAO.createGame(game);
+        compareUserEnc(user, uDAO.getUser(user.username()));
+        assertEquals(auth, aDAO.getAuth(auth.authToken()));
+        assertEquals(game, gDAO.getGame(game.gameID()));
+        uDAO.clear();
+        aDAO.clear();
+        gDAO.clear();
+        assertNull(uDAO.getUser(user.username()));
+        assertNull(aDAO.getAuth(auth.authToken()));
+        assertNull(gDAO.getGame(game.gameID()));
+
+    }
 
     static private ArrayList<Object> sendQueryCommand(String str, Object[][] params) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
@@ -228,5 +252,11 @@ public class DataaccessTests {
         } catch (SQLException ex) {
             throw new DataAccessException(String.format("Unable to connect database: %s", ex.getMessage()));
         }
+    }
+
+    static private void compareUserEnc(UserData user, UserData userEnc) {
+        assertEquals(user.username(), userEnc.username());
+        assertEquals(user.email(), userEnc.email());
+        assertTrue(BCrypt.checkpw(user.password(), userEnc.password()));
     }
 }

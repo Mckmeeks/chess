@@ -2,6 +2,7 @@ package dataaccess;
 
 import dataaccess.interfaces.UserDAO;
 import model.UserData;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -28,7 +29,7 @@ public class MySqlUserDAO implements UserDAO {
     @Override
     public void createUser(UserData u) throws AlreadyTakenException, DataAccessException {
         String create = "INSERT INTO user (name, pass, email) VALUES (?,?,?);";
-        try {sendFlexCommand(create, u.username(), u.password(), u.email());}
+        try {sendFlexCommand(create, u.username(), protect(u.password()), u.email());}
         catch (DataAccessException ex) {
             if (ex.getMessage().startsWith("Duplicate", 27)) {
                 throw new AlreadyTakenException(String.format("Unable to update database: %s", ex.getMessage()));
@@ -129,5 +130,9 @@ public class MySqlUserDAO implements UserDAO {
         } catch (SQLException ex) {
             throw new DataAccessException(String.format("Unable to configure database: %s", ex.getMessage()));
         }
+    }
+
+    private String protect(String pass) {
+        return BCrypt.hashpw(pass, BCrypt.gensalt());
     }
 }

@@ -5,30 +5,32 @@ import com.google.gson.Gson;
 import dataaccess.interfaces.GameDAO;
 
 import model.GameData;
-import service.Game;
 
-import javax.xml.crypto.Data;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
+
+import static java.sql.Types.NULL;
 
 public class MySqlGameDAO implements GameDAO {
 
     private final Gson serializer;
+    private int lastPID = 0;
 
     public MySqlGameDAO() throws DataAccessException {
         serializer = new Gson();
         String[] createGameTableStatement = {
         """
         CREATE TABLE IF NOT EXISTS game (
-          gameID int NOT NULL,
+          id int NOT NULL AUTO_INCREMENT,
+          gameID int NOT NULL UNIQUE,
           wUser varchar(50),
           bUser varchar(256),
           gName varchar(256) NOT NULL,
           gData JSON NOT NULL,
-          PRIMARY KEY (gameID)
+          PRIMARY KEY (id),
+          INDEX (gameID)
         );
         """
         };
@@ -66,7 +68,7 @@ public class MySqlGameDAO implements GameDAO {
     }
 
     public void updateGame(int gameID, GameData game) throws DataAccessException {
-        String get = "UPDATE game SET wUser=(?), bUser=(?), gName=(?), gData=(?) WHERE gameID=(?)";
+        String get = "UPDATE game SET wUser=(?), bUser=(?), gName=(?), gData=(?) WHERE gameID=(?);";
         try (var conn = DatabaseManager.getConnection()) {
             try (var prep = conn.prepareStatement(get)) {
                 prep.setString(1, game.whiteUsername());
@@ -75,13 +77,30 @@ public class MySqlGameDAO implements GameDAO {
                 prep.setString(4, serializer.toJson(game.game()));
                 prep.setInt(5, gameID);
                 prep.executeUpdate();
+                var success = prep.executeQuery("SELECT ROW_COUNT();");
+                if (!success.next()) throw new DataAccessException("Unable to access database");
+                if (success.getInt(1) != 1) {
+                    throw new DataAccessException(String.format("Single update failed in database: %s", success.getInt(1)));
+                }
             }
         } catch (SQLException ex) {
             throw new DataAccessException(String.format("Unable to access database: %s", ex.getMessage()));
         }
     }
 
-    public int getLastID() {return -1;}
+    public int getLastID() throws DataAccessException {
+        String last = "SELECT gameID from game WHERE id=(?);";
+        try (var conn = DatabaseManager.getConnection()) {
+            try (var prep = conn.prepareStatement(last)) {
+                prep.setInt(1, lastPID);
+                var rs = prep.executeQuery();
+                if (rs.next()) {return rs.getInt(1);}
+                else {return 0;}
+            }
+        } catch (SQLException ex) {
+            throw new DataAccessException(String.format("Unable to access database: %s", ex.getMessage()));
+        }
+    }
 
     @Override
     public void clear() throws DataAccessException {
@@ -133,8 +152,13 @@ public class MySqlGameDAO implements GameDAO {
                     if (par instanceof String spar) {prep.setString(i, spar);}
                     else if (par instanceof Integer ipar) {prep.setInt(i, ipar);}
                     else if (par != null) {prep.setString(i, serializer.toJson(par));}
+                    else {prep.setNull(i, NULL);}
                 }
                 prep.executeUpdate();
+                var rs = prep.executeQuery("SELECT LAST_INSERT_ID()");
+                if (rs.next()) {
+                    lastPID = rs.getInt(1);
+                }
             }
             conn.commit();
         } catch (SQLException ex) {

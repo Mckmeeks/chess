@@ -4,6 +4,7 @@ import java.util.Hashtable;
 
 import dataaccess.interfaces.UserDAO;
 import model.UserData;
+import org.mindrot.jbcrypt.BCrypt;
 
 import javax.xml.crypto.Data;
 
@@ -17,7 +18,7 @@ public class MemoryUserDAO implements UserDAO {
     @Override
     public void createUser(UserData u) throws AlreadyTakenException {
         if (userDB.containsKey(u.username())) {throw new AlreadyTakenException("Error: username already taken");}
-        userDB.put(u.username(), u);
+        userDB.put(u.username(), new UserData(u.username(), protect(u.password()), u.email()));
     }
 
     @Override
@@ -33,5 +34,9 @@ public class MemoryUserDAO implements UserDAO {
     @Override
     public int getSize() {
         return userDB.size();
+    }
+
+    private String protect(String pass) {
+        return BCrypt.hashpw(pass, BCrypt.gensalt());
     }
 }

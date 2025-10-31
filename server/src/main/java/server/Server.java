@@ -24,7 +24,7 @@ public class Server {
 
     public Server() {
         javalin = Javalin.create(config -> config.staticFiles.add("web"));
-        memoryImplementation();
+//        memoryImplementation();
         mySqlImplementation();
 
         // Register your endpoints and exception handlers here.
@@ -122,6 +122,8 @@ public class Server {
     private void mySqlImplementation() {
         try {
             uDAO = new MySqlUserDAO();
+            aDAO = new MySqlAuthDAO();
+            gDAO = new MySqlGameDAO();
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
         }
