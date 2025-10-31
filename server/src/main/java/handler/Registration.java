@@ -1,7 +1,6 @@
 package handler;
 
 import com.google.gson.JsonSyntaxException;
-import dataaccess.AlreadyTakenException;
 
 import dataaccess.BadRequestException;
 import dataaccess.DataAccessException;
@@ -21,7 +20,7 @@ public class Registration extends Handler {
         uDAO = userDataAcc;
     }
 
-    public String run(String jsonRequest) throws JsonSyntaxException, AlreadyTakenException, DataAccessException {
+    public String run(String jsonRequest) throws JsonSyntaxException, DataAccessException {
         User userService = new User(uDAO, aDAO);
         RegisterRequest request = serializer.fromJson(jsonRequest, RegisterRequest.class);
         checkArguments(request);

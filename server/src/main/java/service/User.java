@@ -4,16 +4,17 @@ import java.util.UUID;
 
 import dataaccess.DataAccessException;
 import dataaccess.InvalidAuthorizationException;
+
 import dataaccess.interfaces.UserDAO;
 import dataaccess.interfaces.AuthDAO;
 
 import handler.request.RegisterRequest;
 import org.mindrot.jbcrypt.BCrypt;
-import service.result.RegisterResult;
 
 import handler.request.LoginRequest;
-import service.result.LoginResult;
 
+import service.result.RegisterResult;
+import service.result.LoginResult;
 import service.result.LogoutResult;
 
 import model.UserData;

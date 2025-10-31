@@ -2,7 +2,6 @@ package handler;
 
 import dataaccess.BadRequestException;
 import dataaccess.DataAccessException;
-import dataaccess.InvalidAuthorizationException;
 
 import dataaccess.interfaces.AuthDAO;
 import dataaccess.interfaces.GameDAO;
@@ -20,7 +19,7 @@ public class Create extends Handler {
         gDAO = gameDataAcc;
     }
 
-    public String run(String authToken, String gameName) throws InvalidAuthorizationException, BadRequestException, DataAccessException {
+    public String run(String authToken, String gameName) throws BadRequestException, DataAccessException {
         var gameService = new Game(aDAO, gDAO);
         CreateRequest request = serializer.fromJson(gameName, CreateRequest.class);
         checkArguments(request);

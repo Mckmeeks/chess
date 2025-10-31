@@ -1,6 +1,7 @@
 package service;
 
 import chess.ChessGame;
+
 import dataaccess.AlreadyTakenException;
 import dataaccess.BadRequestException;
 import dataaccess.DataAccessException;
@@ -11,12 +12,13 @@ import dataaccess.interfaces.GameDAO;
 
 import handler.request.CreateRequest;
 import handler.request.JoinRequest;
-import model.AuthData;
+
 import service.result.JoinResult;
 import service.result.NewGameResult;
 import service.result.ListResult;
 
 import model.GameData;
+import model.AuthData;
 
 public class Game {
     private final AuthDAO aDAO;

@@ -53,7 +53,7 @@ public class DataaccessTests {
     }
 
     @Test
-    public void positiveCreateUser() throws AlreadyTakenException, DataAccessException {
+    public void positiveCreateUser() throws  DataAccessException {
         uDAO.createUser(user);
         String retrieveStat = "SELECT name, pass, email FROM user WHERE name='" + user.username() + "';";
         var response = sendQueryCommand(retrieveStat, new Object[][]{{"name", "s"}, {"pass", "s"}, {"email", "s"}});
@@ -62,7 +62,7 @@ public class DataaccessTests {
     }
 
     @Test
-    public void negativeCreateUser() throws AlreadyTakenException, DataAccessException {
+    public void negativeCreateUser() throws DataAccessException {
         uDAO.createUser(user);
         assertThrows(AlreadyTakenException.class, () -> uDAO.createUser(user));
     }

@@ -1,9 +1,7 @@
 package dataaccess;
 
 import dataaccess.interfaces.AuthDAO;
-import handler.request.CreateRequest;
 import model.AuthData;
-import model.UserData;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -30,7 +28,6 @@ public class MySqlAuthDAO implements AuthDAO {
         catch (DataAccessException ex) {
             if (ex.getMessage().startsWith("Duplicate", 27)) {
                 return true;
-//                throw new AlreadyTakenException(String.format("Unable to update database: %s", ex.getMessage()));
             }
             throw ex;
         }
@@ -51,7 +48,7 @@ public class MySqlAuthDAO implements AuthDAO {
     }
 
     @Override
-    public void deleteAuth(String token) throws InvalidAuthorizationException, DataAccessException {
+    public void deleteAuth(String token) throws DataAccessException {
         if (getAuth(token) == null) {throw new InvalidAuthorizationException("Invalid Authorization");}
         String delete = "DELETE FROM auth WHERE token=?;";
         sendFlexCommand(delete, token);

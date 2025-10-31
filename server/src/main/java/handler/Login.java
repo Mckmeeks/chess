@@ -2,7 +2,6 @@ package handler;
 
 import dataaccess.BadRequestException;
 import dataaccess.DataAccessException;
-import dataaccess.InvalidAuthorizationException;
 
 import handler.request.LoginRequest;
 import service.result.LoginResult;
@@ -20,7 +19,7 @@ public class Login extends Handler {
         uDAO = userDataAcc;
     }
 
-    public String run(String jsonRequest) throws InvalidAuthorizationException, DataAccessException {
+    public String run(String jsonRequest) throws DataAccessException {
         User userService = new User(uDAO, aDAO);
         LoginRequest request = serializer.fromJson(jsonRequest, LoginRequest.class);
         checkArguments(request);
