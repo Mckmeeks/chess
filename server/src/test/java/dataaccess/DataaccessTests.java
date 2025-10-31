@@ -242,8 +242,8 @@ public class DataaccessTests {
             while (response.next()) {
                 for (int i = 1; i <= params.length; i++) {
                     var par = params[i - 1];
-                    if (par[1] instanceof String _) {collect.add(response.getString((String)par[0]));}
-                    else if (par[1] instanceof Integer _) {collect.add(response.getInt((String)par[0]));}
+                    if (par[1] instanceof String th) {collect.add(response.getString((String)par[0]));}
+                    else if (par[1] instanceof Integer th) {collect.add(response.getInt((String)par[0]));}
                 }
             }
             return collect;
