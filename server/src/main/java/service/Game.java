@@ -27,14 +27,14 @@ public class Game {
         gDAO = gameDataAcc;
     }
 
-    public ListResult listGames(String authToken) throws InvalidAuthorizationException, DataAccessException {
+    public ListResult listGames(String authToken) throws DataAccessException {
         if (aDAO.getAuth(authToken) == null) {throw new InvalidAuthorizationException("Error: unauthorized");}
         ListResult games = new ListResult();
         for (GameData g : gDAO.listGames()) {games.add(g);}
         return games;
     }
 
-    public NewGameResult newGame(String authToken, CreateRequest request) throws InvalidAuthorizationException, DataAccessException {
+    public NewGameResult newGame(String authToken, CreateRequest request) throws DataAccessException {
         if (aDAO.getAuth(authToken) == null) {throw new InvalidAuthorizationException("Error: unauthorized");}
         int newID = makeNewID();
         if (request.gameName().isEmpty()) {throw new BadRequestException("Error: game name not provided");}
@@ -42,7 +42,7 @@ public class Game {
         return new NewGameResult(newID);
     }
 
-    public JoinResult joinGame(String authToken, JoinRequest request) throws InvalidAuthorizationException, AlreadyTakenException, DataAccessException {
+    public JoinResult joinGame(String authToken, JoinRequest request) throws DataAccessException {
         AuthData currentUser = aDAO.getAuth(authToken);
         if (currentUser == null) {throw new InvalidAuthorizationException("Error: unauthorized");}
         GameData reqGame = gDAO.getGame(request.gameID());

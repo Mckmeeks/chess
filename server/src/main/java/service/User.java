@@ -7,8 +7,6 @@ import dataaccess.InvalidAuthorizationException;
 import dataaccess.interfaces.UserDAO;
 import dataaccess.interfaces.AuthDAO;
 
-import dataaccess.AlreadyTakenException;
-
 import handler.request.RegisterRequest;
 import org.mindrot.jbcrypt.BCrypt;
 import service.result.RegisterResult;
@@ -30,13 +28,13 @@ public class User {
         aDAO = authDataAcc;
     }
 
-    public RegisterResult register(RegisterRequest request) throws AlreadyTakenException, DataAccessException {
+    public RegisterResult register(RegisterRequest request) throws DataAccessException {
         uDAO.createUser(new UserData(request.username(), request.password(), request.email()));
         AuthData data = createAuthData(request.username());
         return new RegisterResult(data.username(), data.authToken());
     }
 
-    public LoginResult login(LoginRequest request) throws InvalidAuthorizationException, DataAccessException {
+    public LoginResult login(LoginRequest request) throws DataAccessException {
         UserData userData = uDAO.getUser(request.username());
         if (userData == null) {throw new InvalidAuthorizationException("Error: unauthorized");}
         if (!compEncPass(request.password(), userData.password())) {throw new InvalidAuthorizationException("Error: unauthorized");}
@@ -44,7 +42,7 @@ public class User {
         return new LoginResult(data.username(), data.authToken());
     }
 
-    public LogoutResult logout(String request) throws InvalidAuthorizationException, DataAccessException {
+    public LogoutResult logout(String request) throws DataAccessException {
         aDAO.deleteAuth(request);
         return new LogoutResult();
     }

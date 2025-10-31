@@ -21,7 +21,6 @@ public class Server {
 
     public Server() {
         javalin = Javalin.create(config -> config.staticFiles.add("web"));
-//        memoryImplementation();
         mySqlImplementation();
 
         // Register your endpoints and exception handlers here.
@@ -108,12 +107,6 @@ public class Server {
 
     public void stop() {
         javalin.stop();
-    }
-
-    private void memoryImplementation() {
-        uDAO = new MemoryUserDAO();
-        aDAO = new MemoryAuthDAO();
-        gDAO = new MemoryGameDAO();
     }
 
     private void mySqlImplementation() {

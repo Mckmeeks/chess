@@ -78,7 +78,7 @@ public class MySqlGameDAO implements GameDAO {
                 prep.setInt(5, gameID);
                 prep.executeUpdate();
                 var success = prep.executeQuery("SELECT ROW_COUNT();");
-                if (!success.next()) throw new DataAccessException("Unable to access database");
+                if (!success.next()) {throw new DataAccessException("Unable to access database");}
                 if (success.getInt(1) != 1) {
                     throw new DataAccessException(String.format("Single update failed in database: %s", success.getInt(1)));
                 }
