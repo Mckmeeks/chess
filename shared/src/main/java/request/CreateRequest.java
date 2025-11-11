@@ -1,3 +1,3 @@
-package handler.request;
+package request;
 
 public record CreateRequest(String gameName) {}
