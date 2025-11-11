@@ -8,7 +8,7 @@ import dataaccess.interfaces.GameDAO;
 
 import service.Game;
 
-import service.result.ListResult;
+import result.ListResult;
 
 public class List extends Handler {
     private final GameDAO gDAO;

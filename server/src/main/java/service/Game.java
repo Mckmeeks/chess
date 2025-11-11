@@ -10,12 +10,12 @@ import dataaccess.InvalidAuthorizationException;
 import dataaccess.interfaces.AuthDAO;
 import dataaccess.interfaces.GameDAO;
 
-import handler.request.CreateRequest;
-import handler.request.JoinRequest;
+import request.CreateRequest;
+import request.JoinRequest;
 
-import service.result.JoinResult;
-import service.result.NewGameResult;
-import service.result.ListResult;
+import result.JoinResult;
+import result.NewGameResult;
+import result.ListResult;
 
 import model.GameData;
 import model.AuthData;

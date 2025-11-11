@@ -3,8 +3,8 @@ package handler;
 import dataaccess.BadRequestException;
 import dataaccess.DataAccessException;
 
-import handler.request.LoginRequest;
-import service.result.LoginResult;
+import request.LoginRequest;
+import result.LoginResult;
 
 import dataaccess.interfaces.UserDAO;
 import dataaccess.interfaces.AuthDAO;

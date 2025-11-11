@@ -10,8 +10,8 @@ import org.junit.jupiter.api.Test;
 import dataaccess.*;
 import dataaccess.interfaces.*;
 
-import handler.request.*;
-import service.result.*;
+import request.*;
+import result.*;
 
 public class ServiceUnitTests {
     private static UserDAO uDAO;

@@ -6,10 +6,10 @@ import dataaccess.DataAccessException;
 import dataaccess.interfaces.AuthDAO;
 import dataaccess.interfaces.GameDAO;
 
-import handler.request.CreateRequest;
+import request.CreateRequest;
 import service.Game;
 
-import service.result.NewGameResult;
+import result.NewGameResult;
 
 public class Create extends Handler {
     private final GameDAO gDAO;

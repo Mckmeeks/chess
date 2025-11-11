@@ -4,8 +4,8 @@ import com.google.gson.JsonSyntaxException;
 
 import dataaccess.BadRequestException;
 import dataaccess.DataAccessException;
-import handler.request.RegisterRequest;
-import service.result.RegisterResult;
+import request.RegisterRequest;
+import result.RegisterResult;
 
 import dataaccess.interfaces.UserDAO;
 import dataaccess.interfaces.AuthDAO;

@@ -4,7 +4,7 @@ import dataaccess.DataAccessException;
 
 import dataaccess.interfaces.AuthDAO;
 
-import service.result.LogoutResult;
+import result.LogoutResult;
 
 import service.User;
 

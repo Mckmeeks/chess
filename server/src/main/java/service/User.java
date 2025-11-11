@@ -8,14 +8,14 @@ import dataaccess.InvalidAuthorizationException;
 import dataaccess.interfaces.UserDAO;
 import dataaccess.interfaces.AuthDAO;
 
-import handler.request.RegisterRequest;
+import request.RegisterRequest;
 import org.mindrot.jbcrypt.BCrypt;
 
-import handler.request.LoginRequest;
+import request.LoginRequest;
 
-import service.result.RegisterResult;
-import service.result.LoginResult;
-import service.result.LogoutResult;
+import result.RegisterResult;
+import result.LoginResult;
+import result.LogoutResult;
 
 import model.UserData;
 import model.AuthData;

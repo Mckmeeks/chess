@@ -6,8 +6,8 @@ import dataaccess.DataAccessException;
 import dataaccess.interfaces.AuthDAO;
 import dataaccess.interfaces.GameDAO;
 
-import handler.request.JoinRequest;
-import service.result.JoinResult;
+import request.JoinRequest;
+import result.JoinResult;
 
 import service.Game;
 
