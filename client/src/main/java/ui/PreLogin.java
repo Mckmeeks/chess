@@ -11,17 +11,19 @@ import static ui.EscapeSequences.*;
 
 public class PreLogin {
     private final ServerFacade server;
-    private final String serverURL;
+//    private final String serverURL;
+    private String responseItem;
 //    private State state;
 
     public PreLogin(String serverURL) {
         server = new ServerFacade(serverURL);
-        this.serverURL = serverURL;
+//        this.serverURL = serverURL;
+        responseItem = null;
 //        state = State.SIGNED_OUT;
     }
 
     public void run() {
-        System.out.println(WHITE_KING + " Welcome to chess! Sign in to start" +  WHITE_QUEEN);
+        System.out.println(WHITE_KING + " Welcome to chess! Sign in to start " +  WHITE_QUEEN);
         help();
 
         Scanner scanner = new Scanner(System.in);
@@ -31,6 +33,11 @@ public class PreLogin {
             userPrompt = scanner.nextLine();
 
             executeCommand(userPrompt.split(" "));
+
+            if (responseItem != null) {
+                if (responseItem.equals("quit")) {userPrompt = responseItem;}
+                else {help();}
+            }
         }
     }
 
@@ -46,7 +53,7 @@ public class PreLogin {
             if (ex.code().equals(ResponseException.Code.ServerError)) {System.out.print("Server Error, try again");}
             else {System.out.print(ex.getMessage());}
         } catch (Exception ex) {
-            System.out.print(ex.getMessage());
+            System.out.print(ex.getMessage() + "\n");
         }
     }
 
@@ -70,8 +77,8 @@ public class PreLogin {
     private void login(String[] prompt) throws ResponseException {
         if (prompt.length != 3) {throw new IllegalArgumentException("Invalid arguments: login requires a USERNAME and a PASSWORD");}
         LoginResult result = this.server.login(new LoginRequest(prompt[1], prompt[2]));
-        PostLogin verified = new PostLogin(serverURL, result.authToken());
-        verified.run();
+        PostLogin verified = new PostLogin(server, result.username(), result.authToken());
+        responseItem = verified.run();
     }
 
     private void register(String[] prompt) throws ResponseException {
@@ -80,8 +87,8 @@ public class PreLogin {
         else if (prompt.length == 3) {email = null;}
         else {throw new IllegalArgumentException("Invalid arguments: register requires a USERNAME, PASSWORD, and EMAIL");}
         RegisterResult result = this.server.register(new RegisterRequest(prompt[1], prompt[2], email));
-        PostLogin verified = new PostLogin(serverURL, result.authToken());
-        verified.run();
+        PostLogin verified = new PostLogin(server, prompt[1], result.authToken());
+        responseItem = verified.run();
     }
 
     private void printPrompt() {

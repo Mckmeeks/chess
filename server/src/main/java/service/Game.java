@@ -20,13 +20,17 @@ import result.ListResult;
 import model.GameData;
 import model.AuthData;
 
+import java.util.Random;
+
 public class Game {
     private final AuthDAO aDAO;
     private final GameDAO gDAO;
+    private final Random random;
 
     public Game(AuthDAO authDataAcc, GameDAO gameDataAcc) {
         aDAO = authDataAcc;
         gDAO = gameDataAcc;
+        random = new Random();
     }
 
     public ListResult listGames(String authToken) throws DataAccessException {
@@ -71,8 +75,17 @@ public class Game {
         return new JoinResult();
     }
 
-    private int makeNewID() throws DataAccessException {
-        return gDAO.getLastID() + 1;
+    private int makeNewID() {
+        while (true) {
+            int bound = 1000;
+            try {
+                int tempID = gDAO.getLastID() % 100 + random.nextInt(bound);
+                gDAO.getGame(tempID);
+                return tempID;
+            } catch (DataAccessException ex) {
+                bound += 100;
+            }
+        }
     }
 
 
