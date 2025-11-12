@@ -33,7 +33,10 @@ public class PreLogin {
 
             if (responseItem != null) {
                 if (responseItem.equals("quit")) {userPrompt = responseItem;}
-                else {help();}
+                else {
+                    help();
+                    responseItem = null;
+                }
             }
         }
     }
