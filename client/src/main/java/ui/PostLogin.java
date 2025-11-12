@@ -109,7 +109,7 @@ public class PostLogin {
         wipeIdPairs();
         System.out.println();
 
-        Function<String, String> toNone = name -> {if (name == null) return "None"; else return name;};
+        Function<String, String> toNone = name -> {if (name == null) {return "None";} else {return name;}};
         for (int i = 1; i <= result.getArray().size(); i++) {
             GameData game = result.getArray().get(i-1);
             makeNewIdPair(i, game.gameID());
