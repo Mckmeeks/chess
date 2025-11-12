@@ -50,6 +50,12 @@ public class ServerFacade {
         return handleResponse(response, ListResult.class);
     }
 
+    public GetResult getGame(GetRequest gameID, String auth) throws ResponseException {
+        HttpRequest request = buildRequest("GET", "/game/specific", gameID, auth);
+        HttpResponse<String> response = sendRequest(request);
+        return handleResponse(response, GetResult.class);
+    }
+
     public JoinResult joinGame(JoinRequest join, String auth) throws ResponseException {
         HttpRequest request = buildRequest("PUT", "/game", join, auth);
         HttpResponse<String> response = sendRequest(request);

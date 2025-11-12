@@ -3,7 +3,9 @@ package ui;
 import exception.ResponseException;
 import model.GameData;
 import request.CreateRequest;
+import request.GetRequest;
 import request.JoinRequest;
+import result.GetResult;
 import result.ListResult;
 import result.NewGameResult;
 import server.ServerFacade;
@@ -25,8 +27,8 @@ public class PostLogin {
         this.server = server;
         this.user = user;
         this.authToken = authToken;
-        this.clientToGameIDs =  new Hashtable<Integer, Integer>();
-        this.gameToClientIDs = new Hashtable<Integer, Integer>();
+        this.clientToGameIDs =  new Hashtable<>();
+        this.gameToClientIDs = new Hashtable<>();
     }
 
     public String run() {
@@ -51,7 +53,7 @@ public class PostLogin {
                 case "create" -> createGame(prompt);
                 case "list" -> listGames();
                 case "join" -> playGame(prompt);
-                case "observe" -> observeGame();
+                case "observe" -> observeGame(prompt);
                 case "quit" -> quit();
                 default -> help();
             }
@@ -114,11 +116,14 @@ public class PostLogin {
         int id = testIdInput(prompt[1]);
         if (!prompt[2].equals("WHITE") & !prompt[2].equals("BLACK")) {throw new IllegalArgumentException("Invalid arguments: join requires a WHITE or BLACK color description");}
         server.joinGame(new JoinRequest(prompt[2], clientToGameIDs.get(id)), authToken);
+        GetResult result = server.getGame(new GetRequest(clientToGameIDs.get(id)), authToken);
+        System.out.print(result);
     }
 
-    private void observeGame(String[] prompt) {
+    private void observeGame(String[] prompt) throws ResponseException {
         int id = testIdInput(prompt[1]);
-
+        GetResult result = server.getGame(new GetRequest(clientToGameIDs.get(id)), authToken);
+        System.out.print(result);
     }
 
     private void printPrompt() {

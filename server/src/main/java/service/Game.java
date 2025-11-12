@@ -12,7 +12,9 @@ import dataaccess.interfaces.GameDAO;
 
 import request.CreateRequest;
 import request.JoinRequest;
+import request.GetRequest;
 
+import result.GetResult;
 import result.JoinResult;
 import result.NewGameResult;
 import result.ListResult;
@@ -73,6 +75,11 @@ public class Game {
             }
         }
         return new JoinResult();
+    }
+
+    public GetResult getGame(String authToken, GetRequest request) throws DataAccessException {
+        if (aDAO.getAuth(authToken) == null) {throw new InvalidAuthorizationException("Error: unauthorized");}
+        return new GetResult(gDAO.getGame(request.gameID()));
     }
 
     private int makeNewID() {

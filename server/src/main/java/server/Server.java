@@ -48,6 +48,12 @@ public class Server {
             context.result(result);
         });
 
+        javalin.get("/game/specific", context -> {
+            var getHandler = new Get(aDAO, gDAO);
+            String result = getHandler.run(context.header("Authorization"), context.body());
+            context.result(result);
+        });
+
         javalin.post("/game", context -> {
             var createHandler = new Create(aDAO, gDAO);
             String result = createHandler.run(context.header("Authorization"), context.body());
