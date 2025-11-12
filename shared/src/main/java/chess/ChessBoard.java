@@ -93,10 +93,11 @@ public class ChessBoard {
                 }
                 tempColumn.append("|");
             }
-            tempBoard.append(tempColumn);
+            tempBoard.append(tempColumn.reverse());
             tempBoard.append("\n");
         }
-        return tempBoard.toString();
+        tempBoard.reverse();
+        return tempBoard.toString().strip();
     }
 
     public ChessPiece[][] getBoard() {

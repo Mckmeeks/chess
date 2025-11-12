@@ -170,32 +170,31 @@ public class PostLogin {
         String horizontal;
         List<String> vertical;
         builder.append("\n");
-        if (!user.equals(game.blackUsername())) {
-            horizontal = boarderColor + "    a  b  c  d  e  f  g  h    " + RESET_BG_COLOR;
-            vertical = new ArrayList<>(Arrays.stream("| 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 ".split("\\|")).toList());
-            boardView.removeLast();
+        if (user.equals(game.blackUsername())) {
+            horizontal = boarderColor + "    h  g  f  e  d  c  b  a    " + RESET_BG_COLOR;
+            vertical = new ArrayList<>(Arrays.stream("| 8 | 7 | 6 | 5 | 4 | 3 | 2 | 1 ".split("\\|")).toList());
             boardView = boardView.reversed();
-            boardView.add("\n");
-            builder.append(horizontal);
-            builder.append("\n");
             backgroundColor1 = SET_BG_COLOR_WHITE;
             backgroundColor2 = SET_BG_COLOR_BLACK;
         } else {
-            horizontal = boarderColor + "    h  g  f  e  d  c  b  a    " + RESET_BG_COLOR + "\n";
-            vertical = new ArrayList<>(Arrays.stream("| 8 | 7 | 6 | 5 | 4 | 3 | 2 | 1 ".split("\\|")).toList());
+            horizontal = boarderColor + "    a  b  c  d  e  f  g  h    " + RESET_BG_COLOR;
+            vertical = new ArrayList<>(Arrays.stream("| 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 ".split("\\|")).toList());
             backgroundColor1 = SET_BG_COLOR_BLACK;
             backgroundColor2 = SET_BG_COLOR_WHITE;
-            builder.append(horizontal);
         }
+
+        boardView.add("\n");
+        builder.append(horizontal);
+        builder.append("\n");
         builder.append(boarderColor);
         builder.append(vertical.getLast());
 
-        for (String part : boardView) {
+        for (String part : boardView) { //This iterates through the board
             if (part.equals("\n")) {
                 builder.append(boarderColor);
                 builder.append(vertical.removeLast());
                 builder.append(RESET_BG_COLOR);
-                builder.append(part);
+                builder.append(part); //This is where it actually adds the piece
                 builder.append(boarderColor);
                 builder.append(vertical.getLast());
             }
@@ -211,7 +210,7 @@ public class PostLogin {
         builder.append(RESET_BG_COLOR);
         builder.append(horizontal);
         builder.append(RESET_BG_COLOR);
-        if (!user.equals(game.blackUsername())) {builder.append("\n");}
+        builder.append("\n");
         System.out.print(builder);
     }
 
