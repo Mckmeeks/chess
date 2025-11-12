@@ -109,11 +109,11 @@ public class PostLogin {
         wipeIdPairs();
         System.out.println();
 
+        String format = "\t%d.  %-13s  White: %-10s  Black: %-10s\n";
         Function<String, String> toNone = name -> {if (name == null) {return "None";} else {return name;}};
         for (int i = 1; i <= result.getArray().size(); i++) {
             GameData game = result.getArray().get(i-1);
             makeNewIdPair(i, game.gameID());
-            String format = "\t%d.  %-13s  White: %-10s  Black: %-10s\n";
             System.out.printf(format, i, game.gameName(), toNone.apply(game.whiteUsername()), toNone.apply(game.blackUsername()));
         }
     }
