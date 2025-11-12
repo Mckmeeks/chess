@@ -1,5 +1,8 @@
 package ui;
 
+import chess.ChessBoard;
+import chess.ChessGame;
+import chess.ChessPiece;
 import exception.ResponseException;
 import model.GameData;
 import request.CreateRequest;
@@ -14,6 +17,8 @@ import java.util.Hashtable;
 import java.util.Scanner;
 
 import static ui.EscapeSequences.*;
+import static ui.EscapeSequences.BLACK_KING;
+import static ui.EscapeSequences.BLACK_PAWN;
 import static ui.EscapeSequences.WHITE_QUEEN;
 
 public class PostLogin {
@@ -117,13 +122,13 @@ public class PostLogin {
         if (!prompt[2].equals("WHITE") & !prompt[2].equals("BLACK")) {throw new IllegalArgumentException("Invalid arguments: join requires a WHITE or BLACK color description");}
         server.joinGame(new JoinRequest(prompt[2], clientToGameIDs.get(id)), authToken);
         GetResult result = server.getGame(new GetRequest(clientToGameIDs.get(id)), authToken);
-        System.out.print(result);
+        printGame(result);
     }
 
     private void observeGame(String[] prompt) throws ResponseException {
         int id = testIdInput(prompt[1]);
         GetResult result = server.getGame(new GetRequest(clientToGameIDs.get(id)), authToken);
-        System.out.print(result);
+        printGame(result);
     }
 
     private void printPrompt() {
@@ -146,5 +151,59 @@ public class PostLogin {
         catch (Exception ex) {throw new IllegalArgumentException("Invalid game ID");}
         if (clientToGameIDs.get(id) == null) {throw new IllegalArgumentException("Invalid game ID");}
         return id;
+    }
+
+    private void printGame(GetResult gameResult) {
+        var builder = new StringBuilder();
+        System.out.println(gameResult);
+        GameData game = gameResult.game();
+        System.out.println();
+        ChessBoard board = game.game().getBoard();
+
+        String backgroundColor1;
+        String backgroundColor2;
+        if (user.equals(game.blackUsername())) {
+            backgroundColor1 = SET_BG_COLOR_WHITE;
+            backgroundColor2 = SET_BG_COLOR_BLACK;
+        }
+        else {
+            backgroundColor1 = SET_BG_COLOR_BLACK;
+            backgroundColor2 = SET_BG_COLOR_WHITE;
+        }
+
+        for (String part : board.toString().split("\\|")) {
+            if (part.equals("\n")) { builder.append(RESET_BG_COLOR); }
+            else { builder.append(backgroundColor1); }
+            String tempBackground = backgroundColor2;
+            backgroundColor2 = backgroundColor1;
+            backgroundColor1 = tempBackground;
+            builder.append(translatePiece(part));
+        }
+
+        builder.append(RESET_BG_COLOR);
+        System.out.print(builder);
+
+//        System.out.println();
+//        System.out.println(board.getBoard()[0][0].getTeamColor());
+//        System.out.println(board.getBoard()[0][0].toString());
+    }
+
+    private String translatePiece(String piece) {
+        return switch (piece) {
+            case "R" -> WHITE_ROOK;
+            case "N" -> WHITE_KNIGHT;
+            case "B" -> WHITE_BISHOP;
+            case "Q" -> WHITE_QUEEN;
+            case "K" -> WHITE_KING;
+            case "P" -> WHITE_PAWN;
+            case "r" -> BLACK_ROOK;
+            case "n" -> BLACK_KNIGHT;
+            case "b" -> BLACK_BISHOP;
+            case "q" -> BLACK_QUEEN;
+            case "k" -> BLACK_KING;
+            case "p" -> BLACK_PAWN;
+            case " " -> EMPTY;
+            default -> piece;
+        };
     }
 }
