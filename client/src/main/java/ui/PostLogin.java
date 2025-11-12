@@ -13,8 +13,7 @@ import result.ListResult;
 import result.NewGameResult;
 import server.ServerFacade;
 
-import java.util.Hashtable;
-import java.util.Scanner;
+import java.util.*;
 
 import static ui.EscapeSequences.*;
 import static ui.EscapeSequences.BLACK_KING;
@@ -160,18 +159,13 @@ public class PostLogin {
         System.out.println();
         ChessBoard board = game.game().getBoard();
 
-        String backgroundColor1;
-        String backgroundColor2;
-        if (user.equals(game.blackUsername())) {
-            backgroundColor1 = SET_BG_COLOR_WHITE;
-            backgroundColor2 = SET_BG_COLOR_BLACK;
-        }
-        else {
-            backgroundColor1 = SET_BG_COLOR_BLACK;
-            backgroundColor2 = SET_BG_COLOR_WHITE;
-        }
+        List<String> boardView;
+        String backgroundColor1 = SET_BG_COLOR_BLACK;
+        String backgroundColor2 = SET_BG_COLOR_WHITE;
+        if (!user.equals(game.blackUsername())) {boardView = Arrays.stream(board.toString().split("\\|")).toList().reversed();}
+        else {boardView = Arrays.stream(board.toString().split("\\|")).toList();}
 
-        for (String part : board.toString().split("\\|")) {
+        for (String part : boardView) {
             if (part.equals("\n")) { builder.append(RESET_BG_COLOR); }
             else { builder.append(backgroundColor1); }
             String tempBackground = backgroundColor2;
@@ -181,27 +175,24 @@ public class PostLogin {
         }
 
         builder.append(RESET_BG_COLOR);
+        builder.append(SET_TEXT_COLOR_BLUE);
         System.out.print(builder);
-
-//        System.out.println();
-//        System.out.println(board.getBoard()[0][0].getTeamColor());
-//        System.out.println(board.getBoard()[0][0].toString());
     }
 
     private String translatePiece(String piece) {
         return switch (piece) {
-            case "R" -> WHITE_ROOK;
-            case "N" -> WHITE_KNIGHT;
-            case "B" -> WHITE_BISHOP;
-            case "Q" -> WHITE_QUEEN;
-            case "K" -> WHITE_KING;
-            case "P" -> WHITE_PAWN;
-            case "r" -> BLACK_ROOK;
-            case "n" -> BLACK_KNIGHT;
-            case "b" -> BLACK_BISHOP;
-            case "q" -> BLACK_QUEEN;
-            case "k" -> BLACK_KING;
-            case "p" -> BLACK_PAWN;
+            case "R" -> SET_TEXT_COLOR_MAGENTA + WHITE_ROOK;
+            case "N" -> SET_TEXT_COLOR_MAGENTA + WHITE_KNIGHT;
+            case "B" -> SET_TEXT_COLOR_MAGENTA + WHITE_BISHOP;
+            case "Q" -> SET_TEXT_COLOR_MAGENTA + WHITE_QUEEN;
+            case "K" -> SET_TEXT_COLOR_MAGENTA + WHITE_KING;
+            case "P" -> SET_TEXT_COLOR_MAGENTA + WHITE_PAWN;
+            case "r" -> SET_TEXT_COLOR_LIGHT_GREY + BLACK_ROOK;
+            case "n" -> SET_TEXT_COLOR_LIGHT_GREY + BLACK_KNIGHT;
+            case "b" -> SET_TEXT_COLOR_LIGHT_GREY + BLACK_BISHOP;
+            case "q" -> SET_TEXT_COLOR_LIGHT_GREY + BLACK_QUEEN;
+            case "k" -> SET_TEXT_COLOR_LIGHT_GREY + BLACK_KING;
+            case "p" -> SET_TEXT_COLOR_LIGHT_GREY + BLACK_PAWN;
             case " " -> EMPTY;
             default -> piece;
         };
