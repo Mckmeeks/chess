@@ -98,4 +98,8 @@ public class ChessBoard {
         }
         return tempBoard.toString();
     }
+
+    public ChessPiece[][] getBoard() {
+        return board;
+    }
 }
