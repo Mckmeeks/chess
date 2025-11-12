@@ -1,8 +1,6 @@
 package ui;
 
 import chess.ChessBoard;
-import chess.ChessGame;
-import chess.ChessPiece;
 import exception.ResponseException;
 import model.GameData;
 import request.CreateRequest;
@@ -125,6 +123,7 @@ public class PostLogin {
     }
 
     private void observeGame(String[] prompt) throws ResponseException {
+        if (prompt.length != 2) {throw new IllegalArgumentException("Invalid arguments: observe requires a game ID");}
         int id = testIdInput(prompt[1]);
         GetResult result = server.getGame(new GetRequest(clientToGameIDs.get(id)), authToken);
         printGame(result);
@@ -154,28 +153,58 @@ public class PostLogin {
 
     private void printGame(GetResult gameResult) {
         var builder = new StringBuilder();
-        System.out.println(gameResult);
         GameData game = gameResult.game();
-        System.out.println();
         ChessBoard board = game.game().getBoard();
+        String boarderColor = SET_BG_COLOR_LIGHT_GREY + SET_TEXT_COLOR_BLUE;
 
-        List<String> boardView;
-        String backgroundColor1 = SET_BG_COLOR_BLACK;
-        String backgroundColor2 = SET_BG_COLOR_WHITE;
-        if (!user.equals(game.blackUsername())) {boardView = Arrays.stream(board.toString().split("\\|")).toList().reversed();}
-        else {boardView = Arrays.stream(board.toString().split("\\|")).toList();}
+        List<String> boardView = new ArrayList<>(Arrays.stream(board.toString().split("\\|")).toList());
+        String backgroundColor1;
+        String backgroundColor2;
+        String horizontal;
+        List<String> vertical;
+        builder.append("\n");
+        if (!user.equals(game.blackUsername())) {
+            horizontal = boarderColor + "    a  b  c  d  e  f  g  h    " + RESET_BG_COLOR;
+            vertical = new ArrayList<>(Arrays.stream("| 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 ".split("\\|")).toList());
+            boardView.removeLast();
+            boardView = boardView.reversed();
+            boardView.add("\n");
+            builder.append(horizontal);
+            builder.append("\n");
+            backgroundColor1 = SET_BG_COLOR_WHITE;
+            backgroundColor2 = SET_BG_COLOR_BLACK;
+        } else {
+            horizontal = boarderColor + "    h  g  f  e  d  c  b  a    " + RESET_BG_COLOR + "\n";
+            vertical = new ArrayList<>(Arrays.stream("| 8 | 7 | 6 | 5 | 4 | 3 | 2 | 1 ".split("\\|")).toList());
+            backgroundColor1 = SET_BG_COLOR_BLACK;
+            backgroundColor2 = SET_BG_COLOR_WHITE;
+            builder.append(horizontal);
+        }
+        builder.append(boarderColor);
+        builder.append(vertical.getLast());
 
         for (String part : boardView) {
-            if (part.equals("\n")) { builder.append(RESET_BG_COLOR); }
-            else { builder.append(backgroundColor1); }
+            if (part.equals("\n")) {
+                builder.append(boarderColor);
+                builder.append(vertical.removeLast());
+                builder.append(RESET_BG_COLOR);
+                builder.append(part);
+                builder.append(boarderColor);
+                builder.append(vertical.getLast());
+            }
+            builder.append(backgroundColor1);
+
             String tempBackground = backgroundColor2;
             backgroundColor2 = backgroundColor1;
             backgroundColor1 = tempBackground;
             builder.append(translatePiece(part));
         }
 
-        builder.append(RESET_BG_COLOR);
         builder.append(SET_TEXT_COLOR_BLUE);
+        builder.append(RESET_BG_COLOR);
+        builder.append(horizontal);
+        builder.append(RESET_BG_COLOR);
+        if (!user.equals(game.blackUsername())) {builder.append("\n");}
         System.out.print(builder);
     }
 
@@ -194,6 +223,7 @@ public class PostLogin {
             case "k" -> SET_TEXT_COLOR_LIGHT_GREY + BLACK_KING;
             case "p" -> SET_TEXT_COLOR_LIGHT_GREY + BLACK_PAWN;
             case " " -> EMPTY;
+            case "\n" -> "";
             default -> piece;
         };
     }
