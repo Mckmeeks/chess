@@ -1,22 +1,24 @@
 package ui;
 
-import chess.ChessBoard;
 import exception.ResponseException;
+
 import model.GameData;
+import chess.ChessBoard;
+
 import request.CreateRequest;
 import request.GetRequest;
 import request.JoinRequest;
+
 import result.GetResult;
 import result.ListResult;
 import result.NewGameResult;
+
 import server.ServerFacade;
 
 import java.util.*;
+import java.util.function.Function;
 
 import static ui.EscapeSequences.*;
-import static ui.EscapeSequences.BLACK_KING;
-import static ui.EscapeSequences.BLACK_PAWN;
-import static ui.EscapeSequences.WHITE_QUEEN;
 
 public class PostLogin {
     private final ServerFacade server;
@@ -106,17 +108,22 @@ public class PostLogin {
         ListResult result = server.listGames(authToken);
         wipeIdPairs();
         System.out.println();
+
+        Function<String, String> toNone = name -> {if (name == null) return "None"; else return name;};
         for (int i = 1; i <= result.getArray().size(); i++) {
-            GameData tempGame = result.getArray().get(i-1);
-            makeNewIdPair(i, tempGame.gameID());
-            System.out.println("\t" + i + ".\t" + tempGame.gameName() + "\tWhite: " + tempGame.whiteUsername() + "\t\tBlack: " + tempGame.blackUsername());
+            GameData game = result.getArray().get(i-1);
+            makeNewIdPair(i, game.gameID());
+            String format = "\t%d.  %-13s  White: %-10s  Black: %-10s\n";
+            System.out.printf(format, i, game.gameName(), toNone.apply(game.whiteUsername()), toNone.apply(game.blackUsername()));
         }
     }
 
     private void playGame(String[] prompt) throws ResponseException {
         if (prompt.length != 3) {throw new IllegalArgumentException("Invalid arguments: join requires a game ID and a player COLOR");}
         int id = testIdInput(prompt[1]);
-        if (!prompt[2].equals("WHITE") & !prompt[2].equals("BLACK")) {throw new IllegalArgumentException("Invalid arguments: join requires a WHITE or BLACK color description");}
+        if (!prompt[2].equals("WHITE") & !prompt[2].equals("BLACK")) {
+            throw new IllegalArgumentException("Invalid arguments: join requires a WHITE or BLACK color description");
+        }
         server.joinGame(new JoinRequest(prompt[2], clientToGameIDs.get(id)), authToken);
         GetResult result = server.getGame(new GetRequest(clientToGameIDs.get(id)), authToken);
         printGame(result);

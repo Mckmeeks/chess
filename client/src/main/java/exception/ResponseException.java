@@ -25,7 +25,6 @@ public class ResponseException extends Exception {
 
     public static ResponseException fromJson(int status, String json) {
         var map = new Gson().fromJson(json, HashMap.class);
-//        var status = Code.valueOf(map.get("Status").toString());
         String message = map.get("message").toString();
         return new ResponseException(fromHttpStatusCode(status), message);
     }
@@ -41,12 +40,4 @@ public class ResponseException extends Exception {
             default -> throw new IllegalArgumentException("Unknown Http Status Code: " + httpStatusCode);
         };
     }
-
-    public int toHttpStatusCode() {
-        return switch (code) {
-            case ServerError -> 500;
-            case ClientError -> 400;
-        };
-    }
-
 }

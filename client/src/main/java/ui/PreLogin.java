@@ -2,6 +2,7 @@ package ui;
 
 import exception.ResponseException;
 import server.ServerFacade;
+
 import result.*;
 import request.*;
 
@@ -11,15 +12,11 @@ import static ui.EscapeSequences.*;
 
 public class PreLogin {
     private final ServerFacade server;
-//    private final String serverURL;
     private String responseItem;
-//    private State state;
 
     public PreLogin(String serverURL) {
         server = new ServerFacade(serverURL);
-//        this.serverURL = serverURL;
         responseItem = null;
-//        state = State.SIGNED_OUT;
     }
 
     public void run() {
@@ -58,7 +55,6 @@ public class PreLogin {
     }
 
     private void help() {
-//        StringBuilder builder = new StringBuilder();
         System.out.print(SET_TEXT_COLOR_BLUE +
         """
         
@@ -94,10 +90,4 @@ public class PreLogin {
     private void printPrompt() {
         System.out.print("\n" + RESET_TEXT_COLOR + "[LOGGED_OUT] >>> " + SET_TEXT_COLOR_BLUE);
     }
-
-//    private void assertSignedIn() throws ResponseException {
-//        if (state == State.SIGNED_OUT) {
-//            throw new ResponseException(ResponseException.Code.ClientError, "You must sign in");
-//        }
-//    }
 }
