@@ -55,14 +55,14 @@ public class ChessBoard {
         ChessPiece wPawn = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN);
 
         board = new ChessPiece[][]{
-                {wRook, wKnight, wBishop, wKing, wQueen, wBishop.copy(), wKnight.copy(), wRook.copy()},
+                {wRook, wKnight, wBishop, wQueen, wKing, wBishop.copy(), wKnight.copy(), wRook.copy()},
                 {wPawn, wPawn.copy(), wPawn.copy(), wPawn.copy(), wPawn.copy(), wPawn.copy(), wPawn.copy(), wPawn.copy()},
                 new ChessPiece[8],
                 new ChessPiece[8],
                 new ChessPiece[8],
                 new ChessPiece[8],
                 {pawn, pawn.copy(), pawn.copy(), pawn.copy(), pawn.copy(), pawn.copy(), pawn.copy(), pawn.copy()},
-                {rook, knight, bishop, king, queen, bishop.copy(), knight.copy(), rook.copy()},
+                {rook, knight, bishop, queen, king, bishop.copy(), knight.copy(), rook.copy()},
         };
     }
 
