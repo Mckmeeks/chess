@@ -1,7 +1,7 @@
 package dataaccess.interfaces;
 
-import dataaccess.DataAccessException;
-import dataaccess.InvalidAuthorizationException;
+import dataaccess.exceptions.DataAccessException;
+import dataaccess.exceptions.InvalidAuthorizationException;
 import model.AuthData;
 
 public interface AuthDAO {

@@ -5,6 +5,10 @@ import chess.ChessGame;
 import com.google.gson.Gson;
 import org.mindrot.jbcrypt.BCrypt;
 
+import dataaccess.exceptions.AlreadyTakenException;
+import dataaccess.exceptions.DataAccessException;
+import dataaccess.exceptions.InvalidAuthorizationException;
+
 import dataaccess.interfaces.AuthDAO;
 import dataaccess.interfaces.GameDAO;
 import dataaccess.interfaces.UserDAO;

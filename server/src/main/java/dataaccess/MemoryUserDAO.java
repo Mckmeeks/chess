@@ -2,6 +2,8 @@ package dataaccess;
 
 import java.util.Hashtable;
 
+import dataaccess.exceptions.AlreadyTakenException;
+import dataaccess.exceptions.DataAccessException;
 import dataaccess.interfaces.UserDAO;
 import model.UserData;
 import org.mindrot.jbcrypt.BCrypt;

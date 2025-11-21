@@ -2,8 +2,8 @@ package service;
 
 import java.util.UUID;
 
-import dataaccess.DataAccessException;
-import dataaccess.InvalidAuthorizationException;
+import dataaccess.exceptions.DataAccessException;
+import dataaccess.exceptions.InvalidAuthorizationException;
 
 import dataaccess.interfaces.UserDAO;
 import dataaccess.interfaces.AuthDAO;

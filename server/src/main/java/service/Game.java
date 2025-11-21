@@ -2,10 +2,7 @@ package service;
 
 import chess.ChessGame;
 
-import dataaccess.AlreadyTakenException;
-import dataaccess.BadRequestException;
-import dataaccess.DataAccessException;
-import dataaccess.InvalidAuthorizationException;
+import dataaccess.exceptions.*;
 
 import dataaccess.interfaces.AuthDAO;
 import dataaccess.interfaces.GameDAO;

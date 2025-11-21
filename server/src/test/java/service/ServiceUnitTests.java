@@ -1,6 +1,10 @@
 package service;
 
 import static org.junit.jupiter.api.Assertions.*;
+
+import dataaccess.exceptions.BadRequestException;
+import dataaccess.exceptions.DataAccessException;
+import dataaccess.exceptions.InvalidAuthorizationException;
 import io.javalin.http.BadRequestResponse;
 
 import org.junit.jupiter.api.BeforeAll;

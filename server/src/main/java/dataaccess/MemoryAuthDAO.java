@@ -2,6 +2,7 @@ package dataaccess;
 
 import java.util.Hashtable;
 
+import dataaccess.exceptions.InvalidAuthorizationException;
 import dataaccess.interfaces.AuthDAO;
 import model.AuthData;
 

@@ -1,6 +1,10 @@
 package dataaccess;
 
 import static org.junit.jupiter.api.Assertions.*;
+
+import dataaccess.exceptions.AlreadyTakenException;
+import dataaccess.exceptions.DataAccessException;
+import dataaccess.exceptions.InvalidAuthorizationException;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

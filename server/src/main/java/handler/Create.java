@@ -1,7 +1,7 @@
 package handler;
 
-import dataaccess.BadRequestException;
-import dataaccess.DataAccessException;
+import dataaccess.exceptions.BadRequestException;
+import dataaccess.exceptions.DataAccessException;
 
 import dataaccess.interfaces.AuthDAO;
 import dataaccess.interfaces.GameDAO;

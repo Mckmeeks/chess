@@ -3,6 +3,8 @@ package server;
 import dataaccess.*;
 import io.javalin.*;
 
+import dataaccess.exceptions.*;
+
 import com.google.gson.JsonSyntaxException;
 
 import dataaccess.interfaces.*;

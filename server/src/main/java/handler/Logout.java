@@ -1,6 +1,6 @@
 package handler;
 
-import dataaccess.DataAccessException;
+import dataaccess.exceptions.DataAccessException;
 
 import dataaccess.interfaces.AuthDAO;
 

@@ -2,8 +2,8 @@ package handler;
 
 import com.google.gson.JsonSyntaxException;
 
-import dataaccess.BadRequestException;
-import dataaccess.DataAccessException;
+import dataaccess.exceptions.BadRequestException;
+import dataaccess.exceptions.DataAccessException;
 import request.RegisterRequest;
 import result.RegisterResult;
 
