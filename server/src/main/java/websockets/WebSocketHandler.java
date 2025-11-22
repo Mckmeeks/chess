@@ -106,7 +106,7 @@ public class WebSocketHandler implements WsConnectHandler, WsCloseHandler, WsMes
             GameData validGame = checkGameMove(game, move, user);
             if (validGame == null) {ctx.send(toJSON(new ErrorMessage("Error: Invalid Chess Move")));}
             updateGameMove(validGame);
-            ctx.send(new LoadGame(validGame));
+            ctx.send(toJSON(new LoadGame(validGame)));
             connections.broadcast(command.getGameID(), ctx.session, new Notification(moveMessage(user, move)));
         }
     }
