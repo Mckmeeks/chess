@@ -1,5 +1,6 @@
-package websocket;
+package websockets;
 
+import com.google.gson.Gson;
 import org.eclipse.jetty.websocket.api.Session;
 
 import java.io.IOException;
@@ -27,7 +28,7 @@ public class ConnectionManager {
 
     //broadcast specific message
     public void broadcast(Integer gameID, Session excludeSession, ServerMessage notification) throws IOException {
-        String msg = notification.toString();
+        String msg = new Gson().toJson(notification);
         for (Session session : connections.get(gameID)) {
             if (session.isOpen() & !session.equals(excludeSession)) {
                 session.getRemote().sendString(msg);

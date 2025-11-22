@@ -12,7 +12,7 @@ import dataaccess.interfaces.*;
 import handler.*;
 
 import service.DeleteDB;
-import websocket.WebSocketHandler;
+import websockets.WebSocketHandler;
 
 public class Server {
 

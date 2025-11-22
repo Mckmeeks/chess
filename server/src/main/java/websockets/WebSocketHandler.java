@@ -1,4 +1,4 @@
-package websocket;
+package websockets;
 
 import chess.ChessGame;
 import chess.ChessMove;
@@ -42,9 +42,9 @@ public class WebSocketHandler implements WsConnectHandler, WsCloseHandler, WsMes
     public void handleMessage(@NotNull WsMessageContext ctx) throws DataAccessException, IOException {
         UserGameCommand command = new Gson().fromJson(ctx.message(), UserGameCommand.class);
         if (verify(command.getAuthToken()) == null) {
-            ctx.send(new ErrorMessage("Error: unauthorized"));
+            ctx.send(toJSON(new ErrorMessage("Error: unauthorized")));
             ctx.closeSession();
-            System.out.printf("%s provided invalid authentication, dropped websocket connection", ctx.session);
+            System.out.printf("\n%s provided invalid authentication, dropped websocket connection", ctx.session);
         }
         switch (command.getCommandType()) {
             case UserGameCommand.CommandType.CONNECT -> connect(command, ctx);
@@ -56,13 +56,13 @@ public class WebSocketHandler implements WsConnectHandler, WsCloseHandler, WsMes
 
     @Override
     public void handleClose(@NotNull WsCloseContext ctx) {
-
+        System.out.printf("\n%s websocket closed", ctx.session);
     }
 
 
     private void connect(UserGameCommand command, WsMessageContext ctx) throws DataAccessException, IOException {
         GameData game = gDAO.getGame(command.getGameID());
-        if (game == null) {ctx.send(new ErrorMessage("Error: Invalid GameID"));}
+        if (game == null) {ctx.send(toJSON(new ErrorMessage("Error: Invalid GameID")));}
         else {
             ctx.send(new Gson().toJson(new LoadGame(game)));
             connections.add(command.getGameID(), ctx.session);
@@ -73,7 +73,7 @@ public class WebSocketHandler implements WsConnectHandler, WsCloseHandler, WsMes
 
     private void leave(UserGameCommand command, WsMessageContext ctx) throws DataAccessException, IOException {
         GameData game = gDAO.getGame(command.getGameID());
-        if (game == null) {ctx.send(new ErrorMessage("Error: Invalid GameID"));}
+        if (game == null) {ctx.send(toJSON(new ErrorMessage("Error: Invalid GameID")));}
         else {
             String user = getUser(command.getAuthToken());
             connections.remove(game.gameID(), ctx.session);
@@ -85,7 +85,7 @@ public class WebSocketHandler implements WsConnectHandler, WsCloseHandler, WsMes
 
     private void resign(UserGameCommand command, WsMessageContext ctx) throws DataAccessException, IOException {
         GameData game = gDAO.getGame(command.getGameID());
-        if (game == null) {ctx.send(new ErrorMessage("Error: Invalid GameID"));}
+        if (game == null) {ctx.send(toJSON(new ErrorMessage("Error: Invalid GameID")));}
         else {
             String user = getUser(command.getAuthToken());
             ChessGame internalGame = game.game();
@@ -100,15 +100,19 @@ public class WebSocketHandler implements WsConnectHandler, WsCloseHandler, WsMes
         GameData game = gDAO.getGame(command.getGameID());
         ChessMove move = command.getMove();
         String user = getUser(command.getAuthToken());
-        if (game == null) {ctx.send(new ErrorMessage("Error: Invalid GameID"));}
-        else if (move == null) {ctx.send(new ErrorMessage("Error: Invalid Chess Move"));}
+        if (game == null) {ctx.send(toJSON(new ErrorMessage("Error: Invalid GameID")));}
+        else if (move == null) {ctx.send(toJSON(new ErrorMessage("Error: Invalid Chess Move")));}
         else {
             GameData validGame = checkGameMove(game, move, user);
-            if (validGame == null) {ctx.send(new ErrorMessage("Error: Invalid Chess Move"));}
+            if (validGame == null) {ctx.send(toJSON(new ErrorMessage("Error: Invalid Chess Move")));}
             updateGameMove(validGame);
             ctx.send(new LoadGame(validGame));
             connections.broadcast(command.getGameID(), ctx.session, new Notification(moveMessage(user, move)));
         }
+    }
+
+    private String toJSON(Object o) {
+        return new Gson().toJson(o);
     }
 
 
