@@ -1,33 +1,33 @@
 package websocket;
 
 import chess.ChessGame;
-import com.google.gson.Gson;
+import chess.ChessMove;
+import chess.InvalidMoveException;
+
 import dataaccess.exceptions.DataAccessException;
-import dataaccess.exceptions.InvalidAuthorizationException;
 import dataaccess.interfaces.*;
 
 import model.AuthData;
+import model.GameData;
 
+import java.io.IOException;
 import io.javalin.websocket.*;
 
-import model.GameData;
 import org.jetbrains.annotations.NotNull;
-import websocket.commands.UserGameCommand;
+
+import websocket.commands.*;
 import websocket.messages.*;
 
-import javax.xml.crypto.Data;
-import java.io.IO;
-import java.io.IOException;
+import com.google.gson.Gson;
+
 
 public class WebSocketHandler implements WsConnectHandler, WsCloseHandler, WsMessageHandler {
-    private ConnectionManager connections;
-    private UserDAO uDAO;
-    private AuthDAO aDAO;
-    private GameDAO gDAO;
+    private final ConnectionManager connections;
+    private final AuthDAO aDAO;
+    private final GameDAO gDAO;
 
-    public WebSocketHandler(UserDAO uDAO, AuthDAO aDAO, GameDAO gDAO) {
+    public WebSocketHandler(AuthDAO aDAO, GameDAO gDAO) {
         this.connections = new ConnectionManager();
-        this.uDAO = uDAO;
         this.aDAO = aDAO;
         this.gDAO = gDAO;
     }
@@ -45,13 +45,12 @@ public class WebSocketHandler implements WsConnectHandler, WsCloseHandler, WsMes
             ctx.send(new ErrorMessage("Error: unauthorized"));
             ctx.closeSession();
             System.out.printf("%s provided invalid authentication, dropped websocket connection", ctx.session);
-//            throw new InvalidAuthorizationException("Error: unauthorized");
         }
         switch (command.getCommandType()) {
             case UserGameCommand.CommandType.CONNECT -> connect(command, ctx);
             case UserGameCommand.CommandType.LEAVE -> leave(command, ctx);
             case UserGameCommand.CommandType.RESIGN -> resign(command, ctx);
-            case UserGameCommand.CommandType.MAKE_MOVE -> makeMove();
+            case UserGameCommand.CommandType.MAKE_MOVE -> makeMove(ctx);
         }
     }
 
@@ -63,7 +62,7 @@ public class WebSocketHandler implements WsConnectHandler, WsCloseHandler, WsMes
 
     private void connect(UserGameCommand command, WsMessageContext ctx) throws DataAccessException, IOException {
         GameData game = gDAO.getGame(command.getGameID());
-        if (game == null) {ctx.send(new ErrorMessage("Invalid GameID"));}
+        if (game == null) {ctx.send(new ErrorMessage("Error: Invalid GameID"));}
         else {
             ctx.send(new Gson().toJson(new LoadGame(game)));
             connections.add(command.getGameID(), ctx.session);
@@ -74,7 +73,7 @@ public class WebSocketHandler implements WsConnectHandler, WsCloseHandler, WsMes
 
     private void leave(UserGameCommand command, WsMessageContext ctx) throws DataAccessException, IOException {
         GameData game = gDAO.getGame(command.getGameID());
-        if (game == null) {ctx.send(new ErrorMessage("Invalid GameID"));}
+        if (game == null) {ctx.send(new ErrorMessage("Error: Invalid GameID"));}
         else {
             String user = getUser(command.getAuthToken());
             connections.remove(game.gameID(), ctx.session);
@@ -86,13 +85,29 @@ public class WebSocketHandler implements WsConnectHandler, WsCloseHandler, WsMes
 
     private void resign(UserGameCommand command, WsMessageContext ctx) throws DataAccessException, IOException {
         GameData game = gDAO.getGame(command.getGameID());
-        if (game == null) {ctx.send(new ErrorMessage("Invalid GameID"));}
+        if (game == null) {ctx.send(new ErrorMessage("Error: Invalid GameID"));}
         else {
             String user = getUser(command.getAuthToken());
             ChessGame internalGame = game.game();
             internalGame.setTeamTurn(null);
             gDAO.updateGame(command.getGameID(), new GameData(game.gameID(), game.whiteUsername(), game.blackUsername(), game.gameName(), internalGame));
             connections.broadcast(command.getGameID(), null, new Notification(prepMessage(user, game) + "resigned"));
+        }
+    }
+
+    private void makeMove(WsMessageContext ctx) throws DataAccessException, IOException {
+        MakeMoveCommand command = new Gson().fromJson(ctx.message(), MakeMoveCommand.class);
+        GameData game = gDAO.getGame(command.getGameID());
+        ChessMove move = command.getMove();
+        String user = getUser(command.getAuthToken());
+        if (game == null) {ctx.send(new ErrorMessage("Error: Invalid GameID"));}
+        else if (move == null) {ctx.send(new ErrorMessage("Error: Invalid Chess Move"));}
+        else {
+            GameData validGame = checkGameMove(game, move, user);
+            if (validGame == null) {ctx.send(new ErrorMessage("Error: Invalid Chess Move"));}
+            updateGameMove(validGame);
+            ctx.send(new LoadGame(validGame));
+            connections.broadcast(command.getGameID(), ctx.session, new Notification(moveMessage(user, move)));
         }
     }
 
@@ -112,6 +127,10 @@ public class WebSocketHandler implements WsConnectHandler, WsCloseHandler, WsMes
 
     private String leaveMessage(String user, GameData game) {
         return prepMessage(user, game) + " left the game :(";
+    }
+
+    private String moveMessage(String user, ChessMove move) {
+        return user + ": " + move;
     }
 
     private String prepMessage(String user, GameData game) {
@@ -134,5 +153,40 @@ public class WebSocketHandler implements WsConnectHandler, WsCloseHandler, WsMes
         if (whiteUser == null | blackUser == null) {
             gDAO.updateGame(game.gameID(), new GameData(game.gameID(), whiteUser, blackUser, game.gameName(), game.game()));
         }
+    }
+
+    private GameData checkGameMove(GameData game, ChessMove move, String user) {
+        if (move.getStartPosition() == null | move.getEndPosition() == null) {return null;}
+
+        ChessGame chessGame = game.game();
+        ChessGame.TeamColor turnColor = chessGame.getTeamTurn();
+        ChessGame.TeamColor nextColor;
+
+        switch (turnColor) {
+            case WHITE -> {
+                if (!user.equals(game.whiteUsername())) {
+                    return null;
+                }
+                nextColor = ChessGame.TeamColor.BLACK;
+            }
+            case BLACK -> {
+                if (!user.equals(game.blackUsername())) {
+                    return null;
+                }
+                nextColor = ChessGame.TeamColor.WHITE;
+            }
+            default -> {return null;}
+        }
+
+        try {
+            chessGame.makeMove(move);
+            chessGame.setTeamTurn(nextColor);
+            return new GameData(game.gameID(), game.whiteUsername(), game.blackUsername(), game.gameName(), chessGame);
+        }
+        catch (InvalidMoveException ex) {return null;}
+    }
+
+    private void updateGameMove(GameData game) throws DataAccessException {
+        gDAO.updateGame(game.gameID(), game);
     }
 }

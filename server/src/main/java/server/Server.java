@@ -131,7 +131,7 @@ public class Server {
             uDAO = overDAO.getUserDAO();
             aDAO = overDAO.getAuthDAO();
             gDAO = overDAO.getGameDAO();
-            wsHandler = new WebSocketHandler(uDAO, aDAO, gDAO);
+            wsHandler = new WebSocketHandler(aDAO, gDAO);
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
         }
