@@ -12,10 +12,12 @@ import dataaccess.interfaces.*;
 import handler.*;
 
 import service.DeleteDB;
+import websocket.WebSocketHandler;
 
 public class Server {
 
     private final Javalin javalin;
+    private WebSocketHandler wsHandler;
 
     private UserDAO uDAO;
     private AuthDAO aDAO;
@@ -74,6 +76,12 @@ public class Server {
             context.result("{}");
         });
 
+        javalin.ws("/ws", ws -> {
+            ws.onConnect(wsHandler);
+            ws.onMessage(wsHandler);
+            ws.onClose(wsHandler);
+        });
+
 
         javalin.exception(JsonSyntaxException.class, (e, context) -> {
             context.status(400);
@@ -123,6 +131,7 @@ public class Server {
             uDAO = overDAO.getUserDAO();
             aDAO = overDAO.getAuthDAO();
             gDAO = overDAO.getGameDAO();
+            wsHandler = new WebSocketHandler(uDAO, aDAO, gDAO);
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
         }
