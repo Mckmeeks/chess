@@ -88,10 +88,18 @@ public class WebSocketHandler implements WsConnectHandler, WsCloseHandler, WsMes
         if (game == null) {ctx.send(toJSON(new ErrorMessage("Error: Invalid GameID")));}
         else {
             String user = getUser(command.getAuthToken());
-            ChessGame internalGame = game.game();
-            internalGame.setTeamTurn(ChessGame.TeamColor.FINISHED);
-            gDAO.updateGame(command.getGameID(), new GameData(game.gameID(), game.whiteUsername(), game.blackUsername(), game.gameName(), internalGame));
-            connections.broadcast(command.getGameID(), null, new Notification(prepMessage(user, game) + "resigned"));
+            if (user == null) {ctx.send(toJSON(new ErrorMessage("Error: Invalid Authorization")));}
+            else {
+                ChessGame internalGame = game.game();
+                if (!user.equals(game.whiteUsername()) & !user.equals(game.blackUsername()) | internalGame.getTeamTurn().equals(ChessGame.TeamColor.FINISHED)) {
+                    ctx.send(toJSON(new ErrorMessage("Error: Invalid Authorization")));
+                }
+                else {
+                    internalGame.setTeamTurn(ChessGame.TeamColor.FINISHED);
+                    gDAO.updateGame(command.getGameID(), new GameData(game.gameID(), game.whiteUsername(), game.blackUsername(), game.gameName(), internalGame));
+                    connections.broadcast(command.getGameID(), null, new Notification(prepMessage(user, game) + "resigned"));
+                }
+            }
         }
     }
 
