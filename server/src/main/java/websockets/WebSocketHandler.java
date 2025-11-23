@@ -89,7 +89,7 @@ public class WebSocketHandler implements WsConnectHandler, WsCloseHandler, WsMes
         else {
             String user = getUser(command.getAuthToken());
             ChessGame internalGame = game.game();
-            internalGame.setTeamTurn(null);
+            internalGame.setTeamTurn(ChessGame.TeamColor.FINISHED);
             gDAO.updateGame(command.getGameID(), new GameData(game.gameID(), game.whiteUsername(), game.blackUsername(), game.gameName(), internalGame));
             connections.broadcast(command.getGameID(), null, new Notification(prepMessage(user, game) + "resigned"));
         }
@@ -101,12 +101,12 @@ public class WebSocketHandler implements WsConnectHandler, WsCloseHandler, WsMes
         ChessMove move = command.getMove();
         String user = getUser(command.getAuthToken());
         if (game == null) {ctx.send(toJSON(new ErrorMessage("Error: Invalid GameID")));}
+        else if (game.game().getTeamTurn() == ChessGame.TeamColor.FINISHED) {ctx.send(toJSON(new ErrorMessage("Error: game is finished")));}
         else if (move == null) {ctx.send(toJSON(new ErrorMessage("Error: Invalid Chess Move")));}
         else {
             GameData validGame = checkGameMove(game, move, user);
             if (validGame == null) {ctx.send(toJSON(new ErrorMessage("Error: Invalid Chess Move")));}
             updateGameMove(validGame);
-//            ctx.send(toJSON(new LoadGame(validGame)));
             connections.broadcast(command.getGameID(), null, new LoadGame(validGame));
             connections.broadcast(command.getGameID(), ctx.session, new Notification(moveMessage(user, move)));
         }
