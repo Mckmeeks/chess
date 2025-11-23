@@ -1,8 +1,9 @@
 package server;
 
+import chess.ChessMove;
 import com.google.gson.Gson;
-import exception.ResponseException;
 import jakarta.websocket.*;
+import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ServerMessage;
 
@@ -37,16 +38,16 @@ public class WebSocketFacade extends Endpoint {
         session.getBasicRemote().sendText(toJSON(new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameID)));
     }
 
-    public void resign() {
-
+    public void resign(String authToken, Integer gameID) throws IOException {
+        session.getBasicRemote().sendText(toJSON(new UserGameCommand(UserGameCommand.CommandType.RESIGN, authToken, gameID)));
     }
 
-    public void leave() {
-
+    public void leave(String authToken, Integer gameID) throws IOException {
+        session.getBasicRemote().sendText(toJSON(new UserGameCommand(UserGameCommand.CommandType.LEAVE, authToken, gameID)));
     }
 
-    public void makeMove() {
-
+    public void makeMove(String authToken, Integer gameID, ChessMove move) throws IOException {
+        session.getBasicRemote().sendText(toJSON(new MakeMoveCommand(authToken, gameID, move)));
     }
 
     public void onOpen(Session session, EndpointConfig endpointConfig) {}
