@@ -2,8 +2,10 @@ package server;
 
 import com.google.gson.Gson;
 
+import jakarta.websocket.DeploymentException;
 import model.*;
 
+import java.io.IOException;
 import java.net.*;
 import java.net.http.*;
 
@@ -15,9 +17,11 @@ import request.*;
 public class ServerFacade {
     private final HttpClient client = HttpClient.newHttpClient();
     private final String serverUrl;
+    private final WebSocketFacade webSocket;
 
-    public ServerFacade(String url) {
+    public ServerFacade(String url) throws URISyntaxException, DeploymentException, IOException {
         serverUrl = url;
+        webSocket = new WebSocketFacade(url);
     }
 
     public RegisterResult register(RegisterRequest reg) throws ResponseException {
@@ -67,6 +71,10 @@ public class ServerFacade {
         sendRequest(request);
     }
 
+    public WebSocketFacade getWebSocket() {
+        return webSocket;
+    }
+
     private HttpRequest buildRequest(String method, String path, Object body, String header) {
         HttpRequest.Builder request = HttpRequest.newBuilder()
                 .uri(URI.create(serverUrl + path))
@@ -81,7 +89,6 @@ public class ServerFacade {
     }
 
     private HttpRequest.BodyPublisher makeRequestBody(Object body) {
-//        if (body instanceof String) { return HttpRequest.BodyPublishers.ofString((String)body); }
         if (body != null) { return HttpRequest.BodyPublishers.ofString(new Gson().toJson(body)); }
         else { return HttpRequest.BodyPublishers.noBody(); }
     }
@@ -113,7 +120,3 @@ public class ServerFacade {
         return status == 200;
     }
 }
-
-// incorrect number of arguments, wrong types of arguments (a word when the code expects
-//        a number, arguments in the wrong order, etc.), and arguments that the server rejects
-//        (register with an existing username, login with incorrect username/password, etc.)

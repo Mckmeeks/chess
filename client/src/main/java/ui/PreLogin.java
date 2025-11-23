@@ -1,11 +1,14 @@
 package ui;
 
 import exception.ResponseException;
+import jakarta.websocket.DeploymentException;
 import server.ServerFacade;
 
 import result.*;
 import request.*;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.Scanner;
 
 import static ui.EscapeSequences.*;
@@ -14,7 +17,7 @@ public class PreLogin {
     private final ServerFacade server;
     private String responseItem;
 
-    public PreLogin(String serverURL) {
+    public PreLogin(String serverURL) throws URISyntaxException, DeploymentException, IOException {
         server = new ServerFacade(serverURL);
         responseItem = null;
     }

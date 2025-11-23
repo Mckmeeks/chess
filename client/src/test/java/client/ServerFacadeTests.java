@@ -7,6 +7,7 @@ import dataaccess.interfaces.GameDAO;
 import dataaccess.interfaces.UserDAO;
 import exception.ResponseException;
 
+import jakarta.websocket.DeploymentException;
 import model.*;
 import org.junit.jupiter.api.*;
 
@@ -15,6 +16,9 @@ import server.ServerFacade;
 
 import result.*;
 import request.*;
+
+import java.io.IOException;
+import java.net.URISyntaxException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -31,7 +35,7 @@ public class ServerFacadeTests {
     private static RegisterRequest reg;
 
     @BeforeAll
-    public static void init() throws DataAccessException {
+    public static void init() throws DataAccessException, URISyntaxException, DeploymentException, IOException {
         server = new Server();
         var port = server.run(0);
         System.out.println("Started test HTTP server on " + port);
