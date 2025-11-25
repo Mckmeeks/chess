@@ -11,25 +11,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import static ui.EscapeSequences.*;
-import static ui.EscapeSequences.BLACK_BISHOP;
-import static ui.EscapeSequences.BLACK_KING;
-import static ui.EscapeSequences.BLACK_KNIGHT;
-import static ui.EscapeSequences.BLACK_PAWN;
-import static ui.EscapeSequences.BLACK_QUEEN;
-import static ui.EscapeSequences.BLACK_ROOK;
-import static ui.EscapeSequences.EMPTY;
-import static ui.EscapeSequences.RESET_BG_COLOR;
-import static ui.EscapeSequences.SET_BG_COLOR_BLACK;
-import static ui.EscapeSequences.SET_BG_COLOR_WHITE;
-import static ui.EscapeSequences.SET_TEXT_COLOR_BLUE;
-import static ui.EscapeSequences.SET_TEXT_COLOR_LIGHT_GREY;
-import static ui.EscapeSequences.SET_TEXT_COLOR_MAGENTA;
-import static ui.EscapeSequences.WHITE_BISHOP;
-import static ui.EscapeSequences.WHITE_KING;
-import static ui.EscapeSequences.WHITE_KNIGHT;
-import static ui.EscapeSequences.WHITE_PAWN;
-import static ui.EscapeSequences.WHITE_QUEEN;
-import static ui.EscapeSequences.WHITE_ROOK;
 
 public class MessageUI {
     PrintStream sys;
@@ -39,6 +20,7 @@ public class MessageUI {
     public MessageUI(ChessGame.TeamColor color, GameData game) {
         sys = System.out;
         this.color = color;
+        if (this.color == null) {this.color = ChessGame.TeamColor.WHITE;}
         this.game = game;
     }
 
@@ -47,6 +29,8 @@ public class MessageUI {
     }
 
     public void update(LoadGame game) {
+        this.game = game.getGame();
+        printGame(this.game);
     }
 
     public void tell(Notification note) {
@@ -55,7 +39,9 @@ public class MessageUI {
 
     public void ignore() {}
 
-    public void draw() {}
+    public void draw() {
+        printGame(game);
+    }
 
     private void printGame(GameData game) {
         var builder = new StringBuilder();
