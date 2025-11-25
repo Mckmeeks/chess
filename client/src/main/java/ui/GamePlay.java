@@ -1,7 +1,6 @@
 package ui;
 
 import chess.*;
-import chess.positioning.Knight;
 import exception.ResponseException;
 import model.GameData;
 import request.GetRequest;
@@ -19,10 +18,8 @@ public class GamePlay {
     private final String user;
     private final String authToken;
     private final int gameID;
-//    private final Boolean observer;
     private final GameData game;
     private final ChessGame.TeamColor userColor;
-//    private GetResult currentGame;
 
     public GamePlay(ServerFacade server, String user, String authToken, int gameID) throws ResponseException {
         this.user = user;
@@ -39,13 +36,10 @@ public class GamePlay {
         this.messageUI = new MessageUI(userColor, this.game);
         this.webSocket = server.getWebSocket(this.messageUI);
 
-//        printGame(result.game());
+        this.messageUI.draw();
     }
 
     public void run() {
-//        System.out.println(ERASE_SCREEN + WHITE_KING + " Welcome " + user + "! Let's play some chess!" +  WHITE_QUEEN);
-//        help();
-
         Scanner scanner = new Scanner(System.in);
         var userPrompt = "";
         while (!userPrompt.equals("leave")) {
@@ -99,7 +93,7 @@ public class GamePlay {
     }
 
     private void redraw() throws ResponseException {
-        throw new ResponseException(ResponseException.Code.ServerError, "not implemented");
+        messageUI.draw();
     }
 
     private void leave() throws ResponseException {
@@ -119,7 +113,9 @@ public class GamePlay {
         }
     }
 
-    private void resign() {}
+    private void resign() throws ResponseException {
+        webSocket.resign(authToken, gameID);
+    }
 
     private void highlight(String[] prompt) {}
 
@@ -132,7 +128,7 @@ public class GamePlay {
             String col = loc.toLowerCase().substring(0,1);
             String row = loc.substring(1,2);
             if ("abcdefgh".contains(col) & ("12345678".contains(row))) {
-                return new ChessPosition("abcdefgh".indexOf(col), Integer.parseInt(row));
+                return new ChessPosition(Integer.parseInt(row), "abcdefgh".indexOf(col)+1);
             }
         }
         return null;
