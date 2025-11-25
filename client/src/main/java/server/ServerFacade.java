@@ -13,15 +13,16 @@ import exception.ResponseException;
 
 import result.*;
 import request.*;
+import ui.MessageUI;
 
 public class ServerFacade {
     private final HttpClient client = HttpClient.newHttpClient();
     private final String serverUrl;
-    private final WebSocketFacade webSocket;
+//    private final WebSocketFacade webSocket;
 
-    public ServerFacade(String url) throws URISyntaxException, DeploymentException, IOException {
+    public ServerFacade(String url) {
         serverUrl = url;
-        webSocket = new WebSocketFacade(url);
+//        webSocket = new WebSocketFacade(url);
     }
 
     public RegisterResult register(RegisterRequest reg) throws ResponseException {
@@ -71,8 +72,12 @@ public class ServerFacade {
         sendRequest(request);
     }
 
-    public WebSocketFacade getWebSocket() {
-        return webSocket;
+    public WebSocketFacade getWebSocket(MessageUI messageUI) throws ResponseException {
+        try {
+            return new WebSocketFacade(serverUrl, messageUI);
+        } catch (Exception ex) {
+            throw new ResponseException(ResponseException.Code.ServerError, ex.getMessage());
+        }
     }
 
     private HttpRequest buildRequest(String method, String path, Object body, String header) {

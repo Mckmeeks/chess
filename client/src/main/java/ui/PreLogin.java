@@ -17,7 +17,7 @@ public class PreLogin {
     private final ServerFacade server;
     private String responseItem;
 
-    public PreLogin(String serverURL) throws URISyntaxException, DeploymentException, IOException {
+    public PreLogin(String serverURL) {
         server = new ServerFacade(serverURL);
         responseItem = null;
     }

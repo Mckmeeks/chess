@@ -25,14 +25,14 @@ public class PostLogin {
     private final String user;
     private final String authToken;
     private Hashtable<Integer, Integer> clientToGameIDs;
-    private Hashtable<Integer, Integer> gameToClientIDs;
+//    private Hashtable<Integer, Integer> gameToClientIDs;
 
     public PostLogin(ServerFacade server, String user, String authToken) {
         this.server = server;
         this.user = user;
         this.authToken = authToken;
         this.clientToGameIDs =  new Hashtable<>();
-        this.gameToClientIDs = new Hashtable<>();
+//        this.gameToClientIDs = new Hashtable<>();
     }
 
     public String run() {
@@ -125,15 +125,16 @@ public class PostLogin {
             throw new IllegalArgumentException("Invalid arguments: join requires a WHITE or BLACK color description");
         }
         server.joinGame(new JoinRequest(prompt[2], clientToGameIDs.get(id)), authToken);
-        GetResult result = server.getGame(new GetRequest(clientToGameIDs.get(id)), authToken);
-        printGame(result);
+        new GamePlay(server, user, authToken, clientToGameIDs.get(id)).run();
+        help();
     }
 
     private void observeGame(String[] prompt) throws ResponseException {
         if (prompt.length != 2) {throw new IllegalArgumentException("Invalid arguments: observe requires a game ID");}
         int id = testIdInput(prompt[1]);
-        GetResult result = server.getGame(new GetRequest(clientToGameIDs.get(id)), authToken);
-        printGame(result);
+        boolean observer;
+        new GamePlay(server, user, authToken, clientToGameIDs.get(id)).run();
+        help();
     }
 
     private void printPrompt() {
@@ -142,12 +143,12 @@ public class PostLogin {
 
     private void wipeIdPairs() {
         clientToGameIDs = new Hashtable<>();
-        gameToClientIDs = new Hashtable<>();
+//        gameToClientIDs = new Hashtable<>();
     }
 
     private void makeNewIdPair(Integer client, Integer game) {
         clientToGameIDs.put(client, game);
-        gameToClientIDs.put(game, client);
+//        gameToClientIDs.put(game, client);
     }
 
     private int testIdInput(String sd) {
@@ -156,81 +157,5 @@ public class PostLogin {
         catch (Exception ex) {throw new IllegalArgumentException("Invalid game ID");}
         if (clientToGameIDs.get(id) == null) {throw new IllegalArgumentException("Invalid game ID");}
         return id;
-    }
-
-    private void printGame(GetResult gameResult) {
-        var builder = new StringBuilder();
-        GameData game = gameResult.game();
-        ChessBoard board = game.game().getBoard();
-        String boarderColor = SET_BG_COLOR_LIGHT_GREY + SET_TEXT_COLOR_BLUE;
-
-        List<String> boardView = new ArrayList<>(Arrays.stream(board.toString().split("\\|")).toList());
-        String backgroundColor1;
-        String backgroundColor2;
-        String horizontal;
-        List<String> vertical;
-        builder.append("\n");
-        if (user.equals(game.blackUsername())) {
-            horizontal = boarderColor + "    h  g  f  e  d  c  b  a    " + RESET_BG_COLOR;
-            vertical = new ArrayList<>(Arrays.stream("| 8 | 7 | 6 | 5 | 4 | 3 | 2 | 1 ".split("\\|")).toList());
-            boardView = boardView.reversed();
-            backgroundColor1 = SET_BG_COLOR_WHITE;
-            backgroundColor2 = SET_BG_COLOR_BLACK;
-        } else {
-            horizontal = boarderColor + "    a  b  c  d  e  f  g  h    " + RESET_BG_COLOR;
-            vertical = new ArrayList<>(Arrays.stream("| 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 ".split("\\|")).toList());
-            backgroundColor1 = SET_BG_COLOR_BLACK;
-            backgroundColor2 = SET_BG_COLOR_WHITE;
-        }
-
-        boardView.add("\n");
-        builder.append(horizontal);
-        builder.append("\n");
-        builder.append(boarderColor);
-        builder.append(vertical.getLast());
-
-        for (String part : boardView) { //This iterates through the board
-            if (part.equals("\n")) {
-                builder.append(boarderColor);
-                builder.append(vertical.removeLast());
-                builder.append(RESET_BG_COLOR);
-                builder.append(part); //This is where it actually adds the piece
-                builder.append(boarderColor);
-                builder.append(vertical.getLast());
-            }
-            builder.append(backgroundColor1);
-
-            String tempBackground = backgroundColor2;
-            backgroundColor2 = backgroundColor1;
-            backgroundColor1 = tempBackground;
-            builder.append(translatePiece(part));
-        }
-
-        builder.append(SET_TEXT_COLOR_BLUE);
-        builder.append(RESET_BG_COLOR);
-        builder.append(horizontal);
-        builder.append(RESET_BG_COLOR);
-        builder.append("\n");
-        System.out.print(builder);
-    }
-
-    private String translatePiece(String piece) {
-        return switch (piece) {
-            case "R" -> SET_TEXT_COLOR_MAGENTA + WHITE_ROOK;
-            case "N" -> SET_TEXT_COLOR_MAGENTA + WHITE_KNIGHT;
-            case "B" -> SET_TEXT_COLOR_MAGENTA + WHITE_BISHOP;
-            case "Q" -> SET_TEXT_COLOR_MAGENTA + WHITE_QUEEN;
-            case "K" -> SET_TEXT_COLOR_MAGENTA + WHITE_KING;
-            case "P" -> SET_TEXT_COLOR_MAGENTA + WHITE_PAWN;
-            case "r" -> SET_TEXT_COLOR_LIGHT_GREY + BLACK_ROOK;
-            case "n" -> SET_TEXT_COLOR_LIGHT_GREY + BLACK_KNIGHT;
-            case "b" -> SET_TEXT_COLOR_LIGHT_GREY + BLACK_BISHOP;
-            case "q" -> SET_TEXT_COLOR_LIGHT_GREY + BLACK_QUEEN;
-            case "k" -> SET_TEXT_COLOR_LIGHT_GREY + BLACK_KING;
-            case "p" -> SET_TEXT_COLOR_LIGHT_GREY + BLACK_PAWN;
-            case " " -> EMPTY;
-            case "\n" -> "";
-            default -> piece;
-        };
     }
 }
