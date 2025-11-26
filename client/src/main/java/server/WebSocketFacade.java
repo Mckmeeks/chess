@@ -3,82 +3,129 @@ package server;
 import chess.ChessMove;
 import com.google.gson.Gson;
 import exception.ResponseException;
+
 import jakarta.websocket.*;
+
+import org.glassfish.tyrus.client.ClientManager;
+
+
+//import io.javalin.websocket.*;
+
 import ui.MessageUI;
+
 import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
-import websocket.messages.ErrorMessage;
-import websocket.messages.Notification;
 import websocket.messages.ServerMessage;
-import websocket.messages.LoadGame;
 
 import java.io.IOException;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.List;
 
 public class WebSocketFacade extends Endpoint {
-    public Session session;
+    public final WebSocketContainer container;
+    public final Session session;
+    public final MessageUI messageUI;
+    private volatile boolean open = false;
+    private final Object openLock = new Object();
 
     public WebSocketFacade(String url, MessageUI messageUI) throws URISyntaxException, DeploymentException, IOException {
         URI uri = new URI(url.replaceFirst("http", "ws") + "/ws");
-        WebSocketContainer container = ContainerProvider.getWebSocketContainer();
-        session = container.connectToServer(this, uri);
-//        MessageUI messageUI = new MessageUI();
+        this.container = ContainerProvider.getWebSocketContainer();
+        this.session = container.connectToServer(this, uri);
+        this.messageUI = messageUI;
 
-        this.session.addMessageHandler(new MessageHandler.Whole<String>() {
-                public void onMessage(String message) {
-                    ServerMessage mess = fromJSON(message);
-                    switch (mess.getServerMessageType()) {
-                        case ERROR -> {messageUI.error(new Gson().fromJson(message, ErrorMessage.class));}
-                        case LOAD_GAME -> {messageUI.update(new Gson().fromJson(message, LoadGame.class));}
-                        case NOTIFICATION -> {messageUI.tell(new Gson().fromJson(message, Notification.class));}
-                        default -> {messageUI.ignore();}
-                    }
-                }
+        this.session.addMessageHandler(String.class, message -> {
+//            System.out.println("Server message: " + message);
+            try {
+                messageUI.call(message);
+            } catch (Exception e) {
+                System.out.println("Error handling command: " + e.getMessage());
             }
-        );
+        });
     }
 
     public void connect(String authToken, Integer gameID) throws ResponseException {
         try {
-            session.getBasicRemote().sendText(toJSON(new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameID)));
-        } catch (IOException ex) {
+            waitForOpen();
+            send(new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameID));
+        } catch (Exception ex) {
             throw new ResponseException(ResponseException.Code.ServerError, ex.getMessage());
         }
     }
 
     public void resign(String authToken, Integer gameID) throws ResponseException {
         try {
-            session.getBasicRemote().sendText(toJSON(new UserGameCommand(UserGameCommand.CommandType.RESIGN, authToken, gameID)));
-        } catch (IOException ex) {
+            send(new UserGameCommand(UserGameCommand.CommandType.RESIGN, authToken, gameID));
+        } catch (Exception ex) {
             throw new ResponseException(ResponseException.Code.ServerError, ex.getMessage());
         }
     }
 
     public void leave(String authToken, Integer gameID) throws ResponseException {
         try {
-            session.getBasicRemote().sendText(toJSON(new UserGameCommand(UserGameCommand.CommandType.LEAVE, authToken, gameID)));
-        } catch (IOException ex) {
+            send(new UserGameCommand(UserGameCommand.CommandType.LEAVE, authToken, gameID));
+        } catch (Exception ex) {
             throw new ResponseException(ResponseException.Code.ServerError, ex.getMessage());
         }
     }
 
     public void makeMove(String authToken, Integer gameID, ChessMove move) throws ResponseException {
         try {
-            session.getBasicRemote().sendText(toJSON(new MakeMoveCommand(authToken, gameID, move)));
-        } catch (IOException ex) {
-            throw new ResponseException(ResponseException.Code.ServerError, ex.getMessage());
+            waitForOpen();
+            send(new MakeMoveCommand(authToken, gameID, move));
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
         }
     }
 
-    public void onOpen(Session session, EndpointConfig endpointConfig) {}
-
-    private String toJSON(Object o) {
-        return new Gson().toJson(o);
+    @Override
+    public void onOpen(Session session, EndpointConfig endpointConfig) {
+        synchronized (openLock) {
+            open = true;
+            openLock.notifyAll();
+        }
     }
 
-    private ServerMessage fromJSON(String json) {
-        return new Gson().fromJson(json, ServerMessage.class);
+    @Override
+    public void onError(Session session, Throwable ex) {
+        System.out.println(ex.getMessage());
+    }
+
+    @Override
+    public void onClose(Session session, CloseReason closeReason) {
+        if (closeReason.getCloseCode().getCode() != 1000) {
+            System.out.println("CLOSED: " + closeReason);
+        }
+    }
+
+    private void send(UserGameCommand command) {
+        String json = new Gson().toJson(command);
+        try {
+            session.getBasicRemote().sendText(json);
+        } catch (IOException ex) {
+            System.out.println("IOException: " + ex.getMessage());
+        }
+
+
+//        session.getAsyncRemote().sendText(json, result -> {
+//            if (result.isOK()) {
+//                System.out.println("Sent: " + json);
+//            } else {
+//                System.out.println("Failed to send: " + result.getException());
+//            }
+//        });
+    }
+
+    private void waitForOpen() throws ResponseException {
+        synchronized (openLock) {
+            try {
+                while (!open) openLock.wait();
+            } catch (InterruptedException e) {
+                throw new ResponseException(ResponseException.Code.ServerError, "Interrupted while waiting for WebSocket open");
+            }
+        }
     }
 }
+

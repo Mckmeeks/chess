@@ -2,6 +2,7 @@ package ui;
 
 import chess.ChessBoard;
 import chess.ChessGame;
+import com.google.gson.Gson;
 import model.GameData;
 import websocket.messages.*;
 
@@ -13,34 +14,49 @@ import java.util.List;
 import static ui.EscapeSequences.*;
 
 public class MessageUI {
-    PrintStream sys;
-    GameData game;
-    ChessGame.TeamColor color;
+    private GameData game;
+    private ChessGame.TeamColor color;
 
     public MessageUI(ChessGame.TeamColor color, GameData game) {
-        sys = System.out;
         this.color = color;
         if (this.color == null) {this.color = ChessGame.TeamColor.WHITE;}
         this.game = game;
     }
 
-    public void error(ErrorMessage error) {
-        sys.println(error.getErrorMessage());
+    public void call(String message) {
+        ServerMessage mess = new Gson().fromJson(message, ServerMessage.class);
+        switch (mess.getServerMessageType()) {
+            case ERROR -> {error(new Gson().fromJson(message, ErrorMessage.class));}
+            case LOAD_GAME -> {update(new Gson().fromJson(message, LoadGame.class));}
+            case NOTIFICATION -> {tell(new Gson().fromJson(message, Notification.class));}
+            default -> {ignore();}
+        }
     }
 
-    public void update(LoadGame game) {
-        this.game = game.getGame();
-        printGame(this.game);
+    private void error(ErrorMessage error) {
+        System.out.println(Arrays.stream(error.getErrorMessage().split(": ")).toList().getLast());
     }
 
-    public void tell(Notification note) {
-        sys.println(note.getNotification());
+    private void update(LoadGame game) {
+        if (game.getGame() != null) {
+            this.game = game.getGame();
+            draw();
+        }
     }
 
-    public void ignore() {}
+    private void tell(Notification note) {
+        System.out.println(note.getNotification());
+    }
+
+    private void ignore() {}
 
     public void draw() {
         printGame(game);
+        printPrompt();
+    }
+
+    private void printPrompt() {
+        System.out.print("\n" + RESET_TEXT_COLOR + "message ui [LOGGED_IN] >>> " + SET_TEXT_COLOR_BLUE);
     }
 
     private void printGame(GameData game) {

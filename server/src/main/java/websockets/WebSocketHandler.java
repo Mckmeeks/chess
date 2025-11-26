@@ -11,7 +11,10 @@ import model.AuthData;
 import model.GameData;
 
 import java.io.IOException;
+
 import io.javalin.websocket.*;
+
+//import jakarta.websocket.*;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -34,34 +37,43 @@ public class WebSocketHandler implements WsConnectHandler, WsCloseHandler, WsMes
 
     @Override
     public void handleConnect(@NotNull WsConnectContext ctx){
-        System.out.printf("Websocket connected by %s", ctx.session);
+        System.out.printf("\nWebsocket connected by %s", ctx.sessionId());
+        System.out.println("\n" + ctx.headerMap());
+        System.out.println(ctx.session.getInputBufferSize());
         ctx.enableAutomaticPings();
     }
 
     @Override
     public void handleMessage(@NotNull WsMessageContext ctx) throws DataAccessException, IOException {
+        System.out.println("Handling message");
+        System.out.println("Message: " + ctx.message());
         UserGameCommand command = new Gson().fromJson(ctx.message(), UserGameCommand.class);
         if (verify(command.getAuthToken()) == null) {
             ctx.send(toJSON(new ErrorMessage("Error: unauthorized")));
             ctx.closeSession();
-            System.out.printf("\n%s provided invalid authentication, dropped websocket connection", ctx.session);
-        }
-        switch (command.getCommandType()) {
-            case UserGameCommand.CommandType.CONNECT -> connect(command, ctx);
-            case UserGameCommand.CommandType.LEAVE -> leave(command, ctx);
-            case UserGameCommand.CommandType.RESIGN -> resign(command, ctx);
-            case UserGameCommand.CommandType.MAKE_MOVE -> makeMove(ctx);
+            System.out.printf("\n%s provided invalid authentication, dropped websocket connection", ctx.sessionId());
+        } else {
+            System.out.println(command.getCommandType());
+            switch (command.getCommandType()) {
+                case UserGameCommand.CommandType.CONNECT -> connect(command, ctx);
+                case UserGameCommand.CommandType.LEAVE -> leave(command, ctx);
+                case UserGameCommand.CommandType.RESIGN -> resign(command, ctx);
+                case UserGameCommand.CommandType.MAKE_MOVE -> makeMove(ctx);
+                default -> {}
+            }
         }
     }
 
     @Override
     public void handleClose(@NotNull WsCloseContext ctx) {
-        System.out.printf("\n%s websocket closed", ctx.session);
+        System.out.printf("\n%s websocket closed", ctx.sessionId());
+        System.out.println("\n" + ctx.reason());
+        System.out.println(ctx.sessionAttributeMap());
     }
-
 
     private void connect(UserGameCommand command, WsMessageContext ctx) throws DataAccessException, IOException {
         GameData game = gDAO.getGame(command.getGameID());
+        System.out.println("Started connect method");
         if (game == null) {ctx.send(toJSON(new ErrorMessage("Error: Invalid GameID")));}
         else {
             ctx.send(new Gson().toJson(new LoadGame(game)));
@@ -113,10 +125,13 @@ public class WebSocketHandler implements WsConnectHandler, WsCloseHandler, WsMes
         else if (move == null) {ctx.send(toJSON(new ErrorMessage("Error: Invalid Chess Move")));}
         else {
             GameData validGame = checkGameMove(game, move, user);
-            if (validGame == null) {ctx.send(toJSON(new ErrorMessage("Error: Invalid Chess Move")));}
-            updateGameMove(validGame);
-            connections.broadcast(command.getGameID(), null, new LoadGame(validGame));
-            connections.broadcast(command.getGameID(), ctx.session, new Notification(moveMessage(user, move)));
+            if (validGame == null) {
+                ctx.send(toJSON(new ErrorMessage("Error: Invalid Chess Move")));
+            } else {
+                updateGameMove(validGame);
+                connections.broadcast(command.getGameID(), null, new LoadGame(validGame));
+                connections.broadcast(command.getGameID(), ctx.session, new Notification(moveMessage(user, move)));
+            }
         }
     }
 

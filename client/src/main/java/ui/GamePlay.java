@@ -35,17 +35,17 @@ public class GamePlay {
 
         this.messageUI = new MessageUI(userColor, this.game);
         this.webSocket = server.getWebSocket(this.messageUI);
-
-        this.messageUI.draw();
+        this.webSocket.connect(authToken, gameID);
     }
 
     public void run() {
         Scanner scanner = new Scanner(System.in);
         var userPrompt = "";
-        while (!userPrompt.equals("leave")) {
-            printPrompt();
-            userPrompt = scanner.nextLine();
 
+//        printPrompt();
+
+        while (!userPrompt.equals("leave")) {
+            userPrompt = scanner.nextLine();
             executeCommand(userPrompt.split(" "));
         }
     }
@@ -90,6 +90,7 @@ public class GamePlay {
                     """
             );
         }
+        printPrompt();
     }
 
     private void redraw() throws ResponseException {
@@ -105,12 +106,8 @@ public class GamePlay {
         ChessPiece.PieceType piece = null;
         if (prompt.length > 4) {piece = checkPiece(prompt[3]);}
         ChessMove proposedMove = new ChessMove(checkLoc(prompt[1]), checkLoc(prompt[2]), piece);
-        try {
-            game.game().makeMove(proposedMove);
-            webSocket.makeMove(authToken, gameID, proposedMove);
-        } catch (InvalidMoveException ex) {
-            System.out.println("Illegal move");
-        }
+
+        webSocket.makeMove(authToken, gameID, proposedMove);
     }
 
     private void resign() throws ResponseException {
@@ -120,7 +117,7 @@ public class GamePlay {
     private void highlight(String[] prompt) {}
 
     private void printPrompt() {
-        System.out.print("\n" + RESET_TEXT_COLOR + "[LOGGED_IN] >>> " + SET_TEXT_COLOR_BLUE);
+        System.out.print("\n" + RESET_TEXT_COLOR + "game play [LOGGED_IN] >>> " + SET_TEXT_COLOR_BLUE);
     }
 
     private ChessPosition checkLoc(String loc) {

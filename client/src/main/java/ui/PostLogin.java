@@ -132,8 +132,9 @@ public class PostLogin {
     private void observeGame(String[] prompt) throws ResponseException {
         if (prompt.length != 2) {throw new IllegalArgumentException("Invalid arguments: observe requires a game ID");}
         int id = testIdInput(prompt[1]);
-        boolean observer;
-        new GamePlay(server, user, authToken, clientToGameIDs.get(id)).run();
+//        boolean observer;
+        GamePlay gameUI = new GamePlay(server, user, authToken, clientToGameIDs.get(id));
+        gameUI.run();
         help();
     }
 
