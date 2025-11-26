@@ -63,8 +63,9 @@ public class GamePlay {
         } catch (ResponseException ex) {
             if (ex.code().equals(ResponseException.Code.ServerError)) {System.out.print("Server Error, try again");}
             else {System.out.print(ex.getMessage());}
-        } catch (Exception ex) {
+        } catch (IllegalArgumentException ex) {
             System.out.print(ex.getMessage());
+            printPrompt();
         }
     }
 
@@ -102,11 +103,11 @@ public class GamePlay {
     }
 
     private void makeMove(String[] prompt) throws ResponseException {
-        if (prompt.length < 3) {throw new IllegalArgumentException("Invalid arguments: making a move requires a start and end position: move b2 b3");}
+        if (prompt.length < 3) {throw new IllegalArgumentException("Making a move requires a start and end position (e.g. 'move b2 b3')");}
         ChessPiece.PieceType piece = null;
         if (prompt.length > 4) {piece = checkPiece(prompt[3]);}
         ChessMove proposedMove = new ChessMove(checkLoc(prompt[1]), checkLoc(prompt[2]), piece);
-
+        if (!game.game().getTeamTurn().equals(userColor)) {throw new IllegalArgumentException("It's not your turn!");}
         webSocket.makeMove(authToken, gameID, proposedMove);
     }
 
