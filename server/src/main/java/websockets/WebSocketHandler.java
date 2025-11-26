@@ -79,7 +79,7 @@ public class WebSocketHandler implements WsConnectHandler, WsCloseHandler, WsMes
             ctx.send(new Gson().toJson(new LoadGame(game)));
             connections.add(command.getGameID(), ctx.session);
             String user = getUser(command.getAuthToken());
-            connections.broadcast(command.getGameID(), ctx.session, new Notification(connectMessage(user, game)));
+            connections.broadcast(command.getGameID(), ctx.session, new Notification(connectMessage(user, game), Notification.nType.SHALOM));
         }
     }
 
@@ -90,7 +90,7 @@ public class WebSocketHandler implements WsConnectHandler, WsCloseHandler, WsMes
             String user = getUser(command.getAuthToken());
             connections.remove(game.gameID(), ctx.session);
             leaveGame(game, user);
-            connections.broadcast(command.getGameID(), null, new Notification(leaveMessage(user, game)));
+            connections.broadcast(command.getGameID(), null, new Notification(leaveMessage(user, game), Notification.nType.SHALOM));
             ctx.closeSession();
         }
     }
@@ -109,7 +109,7 @@ public class WebSocketHandler implements WsConnectHandler, WsCloseHandler, WsMes
                 else {
                     internalGame.setTeamTurn(ChessGame.TeamColor.FINISHED);
                     gDAO.updateGame(command.getGameID(), new GameData(game.gameID(), game.whiteUsername(), game.blackUsername(), game.gameName(), internalGame));
-                    connections.broadcast(command.getGameID(), null, new Notification(prepMessage(user, game) + "resigned"));
+                    connections.broadcast(command.getGameID(), null, new Notification(prepMessage(user, game) + "resigned", Notification.nType.SHALOM));
                 }
             }
         }
@@ -130,7 +130,7 @@ public class WebSocketHandler implements WsConnectHandler, WsCloseHandler, WsMes
             } else {
                 updateGameMove(validGame);
                 connections.broadcast(command.getGameID(), null, new LoadGame(validGame));
-                connections.broadcast(command.getGameID(), ctx.session, new Notification(moveMessage(user, move)));
+                connections.broadcast(command.getGameID(), ctx.session, new Notification(moveMessage(user, move), Notification.nType.MOVE));
             }
         }
     }
