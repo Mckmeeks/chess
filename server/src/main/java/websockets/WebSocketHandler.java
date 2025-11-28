@@ -109,7 +109,7 @@ public class WebSocketHandler implements WsConnectHandler, WsCloseHandler, WsMes
                 else {
                     internalGame.setTeamTurn(ChessGame.TeamColor.FINISHED);
                     gDAO.updateGame(command.getGameID(), new GameData(game.gameID(), game.whiteUsername(), game.blackUsername(), game.gameName(), internalGame));
-                    connections.broadcast(command.getGameID(), null, new Notification(prepMessage(user, game) + "resigned", Notification.nType.SHALOM));
+                    connections.broadcast(command.getGameID(), null, new Notification(prepMessage(user, game) + " resigned", Notification.nType.SHALOM));
                 }
             }
         }
@@ -125,12 +125,34 @@ public class WebSocketHandler implements WsConnectHandler, WsCloseHandler, WsMes
         else if (move == null) {ctx.send(toJSON(new ErrorMessage("Error: Invalid Chess Move")));}
         else {
             GameData validGame = checkGameMove(game, move, user);
+            ChessGame.TeamColor nextTurn = game.game().getTeamTurn();
             if (validGame == null) {
-                ctx.send(toJSON(new ErrorMessage("Error: Invalid Chess Move")));
+                String error = "Error: Invalid Chess Move";
+                if (game.game().isInCheck(nextTurn)) {
+                    if (game.game().isInCheckmate(nextTurn)) {
+                        error += ", you are in checkmate";
+                    }
+                    else {
+                        error += ", you are in check";
+                    }
+                }
+                ctx.send(toJSON(new ErrorMessage(error)));
             } else {
                 updateGameMove(validGame);
+                String opUser;
+                if (user.equals(validGame.whiteUsername())) {opUser = validGame.blackUsername();} else {opUser = validGame.whiteUsername();}
                 connections.broadcast(command.getGameID(), null, new LoadGame(validGame));
                 connections.broadcast(command.getGameID(), ctx.session, new Notification(moveMessage(user, move), Notification.nType.MOVE));
+                if (validGame.game().isInCheck(nextTurn)) {
+                    if (validGame.game().isInCheckmate(nextTurn)) {
+                        connections.broadcast(command.getGameID(), null, new Notification(prepMessage(opUser, validGame) + " is in Checkmate", Notification.nType.SHALOM));
+                    } else {
+                        connections.broadcast(command.getGameID(), null, new Notification(prepMessage(opUser, validGame) + " is in check", Notification.nType.SHALOM));
+                    }
+                }
+                else if (validGame.game().isInStalemate(nextTurn)) {
+                    connections.broadcast(command.getGameID(), null, new Notification(prepMessage(opUser, validGame) + " is in stalemate", Notification.nType.SHALOM));
+                }
             }
         }
     }

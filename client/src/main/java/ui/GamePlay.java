@@ -15,34 +15,33 @@ import static ui.EscapeSequences.*;
 public class GamePlay {
     private final WebSocketFacade webSocket;
     private final MessageUI messageUI;
-    private final String user;
     private final String authToken;
     private final int gameID;
-    private final GameData game;
-    private final ChessGame.TeamColor userColor;
+    private ChessGame.TeamColor userColor;
 
     public GamePlay(ServerFacade server, String user, String authToken, int gameID) throws ResponseException {
-        this.user = user;
         this.authToken = authToken;
         this.gameID = gameID;
 
         GetResult result = server.getGame(new GetRequest(gameID), authToken);
-        this.game = result.game();
+        GameData game = result.game();
 
         if (user.equals(game.whiteUsername())) {userColor = ChessGame.TeamColor.WHITE;}
         else if (user.equals(game.blackUsername())) {userColor = ChessGame.TeamColor.BLACK;}
         else {userColor = null;}
 
-        this.messageUI = new MessageUI(userColor, this.game);
+        this.messageUI = new MessageUI(userColor, game);
         this.webSocket = server.getWebSocket(this.messageUI);
         this.webSocket.connect(authToken, gameID);
+
+        if (game.game().getTeamTurn().equals(ChessGame.TeamColor.FINISHED)) {
+            userColor = null;
+        }
     }
 
     public void run() {
         Scanner scanner = new Scanner(System.in);
         var userPrompt = "";
-
-//        printPrompt();
 
         while (!userPrompt.equals("leave")) {
             userPrompt = scanner.nextLine();
@@ -64,7 +63,7 @@ public class GamePlay {
             if (ex.code().equals(ResponseException.Code.ServerError)) {System.out.print("Server Error, try again");}
             else {System.out.print(ex.getMessage());}
         } catch (IllegalArgumentException ex) {
-            System.out.print(ex.getMessage());
+            System.out.print(ex.getMessage() + "\n");
             printPrompt();
         }
     }
@@ -107,7 +106,8 @@ public class GamePlay {
         ChessPiece.PieceType piece = null;
         if (prompt.length > 4) {piece = checkPiece(prompt[3]);}
         ChessMove proposedMove = new ChessMove(checkLoc(prompt[1]), checkLoc(prompt[2]), piece);
-        if (!game.game().getTeamTurn().equals(userColor)) {throw new IllegalArgumentException("It's not your turn!");}
+        if (messageUI.getCurrentGame().game().getTeamTurn() == ChessGame.TeamColor.FINISHED) {throw new IllegalArgumentException("Game is finished");}
+        else if (!messageUI.getCurrentGame().game().getTeamTurn().equals(userColor)) {throw new IllegalArgumentException("It's not your turn!");}
         webSocket.makeMove(authToken, gameID, proposedMove);
     }
 
