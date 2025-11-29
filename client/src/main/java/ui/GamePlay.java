@@ -54,8 +54,8 @@ public class GamePlay {
             switch (prompt[0]) {
                 case "redraw" -> redraw();
                 case "leave" -> leave();
-                case "move" -> {if (userColor != null) makeMove(prompt); else help();}
-                case "resign" -> {if (userColor != null) resign(); else help();}
+                case "move" -> { if (userColor != null) {makeMove(prompt);} else {help();} }
+                case "resign" -> { if (userColor != null) {resign();} else {help();} }
                 case "highlight" -> highlight(prompt);
                 default -> help();
             }

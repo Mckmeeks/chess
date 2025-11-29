@@ -104,7 +104,7 @@ public class WebSocketFacade extends Endpoint {
     private void waitForOpen() throws ResponseException {
         synchronized (openLock) {
             try {
-                while (!open) openLock.wait();
+                while (!open) {openLock.wait();}
             } catch (InterruptedException e) {
                 throw new ResponseException(ResponseException.Code.ServerError, "Interrupted while waiting for WebSocket open");
             }
