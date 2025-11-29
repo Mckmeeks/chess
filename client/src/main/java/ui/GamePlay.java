@@ -104,7 +104,7 @@ public class GamePlay {
     private void makeMove(String[] prompt) throws ResponseException {
         if (prompt.length < 3) {throw new IllegalArgumentException("Making a move requires a start and end position (e.g. 'move b2 b3')");}
         ChessPiece.PieceType piece = null;
-        if (prompt.length > 4) {piece = checkPiece(prompt[3]);}
+        if (prompt.length > 3) {piece = checkPiece(prompt[3]);}
         ChessMove proposedMove = new ChessMove(checkLoc(prompt[1]), checkLoc(prompt[2]), piece);
         if (messageUI.getCurrentGame().game().getTeamTurn() == ChessGame.TeamColor.FINISHED) {throw new IllegalArgumentException("Game is finished");}
         else if (!messageUI.getCurrentGame().game().getTeamTurn().equals(userColor)) {throw new IllegalArgumentException("It's not your turn!");}
@@ -134,7 +134,7 @@ public class GamePlay {
     }
 
     private void printPrompt() {
-        System.out.print("\n" + RESET_TEXT_COLOR + "game play [LOGGED_IN] >>> " + SET_TEXT_COLOR_BLUE);
+        System.out.print("\n" + RESET_TEXT_COLOR + "[LOGGED_IN] >>> " + SET_TEXT_COLOR_BLUE);
     }
 
     private ChessPosition checkLoc(String loc) {
