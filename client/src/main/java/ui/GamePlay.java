@@ -115,7 +115,23 @@ public class GamePlay {
         webSocket.resign(authToken, gameID);
     }
 
-    private void highlight(String[] prompt) {}
+    private void highlight(String[] prompt) {
+        if (prompt.length != 2) {throw new IllegalArgumentException("Highlighting valid moves requires a piece to highlight (e.g. 'highlight d2')");}
+        else {
+            int row = 0;
+            int col = 0;
+            try {
+                col = "abcdefgh".indexOf(prompt[1].substring(0, 1)) + 1;
+                row = Integer.parseInt(prompt[1].substring(1, 2));
+                if (col < 1 | row < 1 | row > 8) {
+                    throw new Exception("");
+                }
+            } catch (Exception ex) {
+                throw new IllegalArgumentException("Highlighting valid moves requires a piece to highlight (e.g 'highlight d2')");
+            }
+            messageUI.highlightDraw(new ChessPosition(row, col));
+        }
+    }
 
     private void printPrompt() {
         System.out.print("\n" + RESET_TEXT_COLOR + "game play [LOGGED_IN] >>> " + SET_TEXT_COLOR_BLUE);
