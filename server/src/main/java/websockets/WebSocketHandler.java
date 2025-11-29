@@ -125,31 +125,19 @@ public class WebSocketHandler implements WsConnectHandler, WsCloseHandler, WsMes
             GameData validGame = checkGameMove(game, move, user);
             ChessGame.TeamColor nextTurn = game.game().getTeamTurn();
             if (validGame == null) {
-                String error = "Error: Invalid Chess Move";
-                if (game.game().isInCheck(nextTurn)) {
-                    if (game.game().isInCheckmate(nextTurn)) {
-                        error += ", you are in checkmate";
-                    }
-                    else {
-                        error += ", you are in check";
-                    }
-                }
+                String error = "Error: Invalid chess move";
+                String status = getGameStatus(game.game(), nextTurn);
+                if (!status.isEmpty()) {error += ", you are in " + status;}
                 ctx.send(toJSON(new ErrorMessage(error)));
             } else {
                 updateGameMove(validGame);
                 String opUser;
                 if (user.equals(validGame.whiteUsername())) {opUser = validGame.blackUsername();} else {opUser = validGame.whiteUsername();}
                 connections.broadcast(command.getGameID(), null, new LoadGame(validGame));
-                connections.broadcast(command.getGameID(), ctx.session, new Notification(moveMessage(user, move), Notification.nType.MOVE));
-                if (validGame.game().isInCheck(nextTurn)) {
-                    if (validGame.game().isInCheckmate(nextTurn)) {
-                        connections.broadcast(command.getGameID(), null, new Notification(prepMessage(opUser, validGame) + " is in Checkmate", Notification.nType.SHALOM));
-                    } else {
-                        connections.broadcast(command.getGameID(), null, new Notification(prepMessage(opUser, validGame) + " is in check", Notification.nType.SHALOM));
-                    }
-                }
-                else if (validGame.game().isInStalemate(nextTurn)) {
-                    connections.broadcast(command.getGameID(), null, new Notification(prepMessage(opUser, validGame) + " is in stalemate", Notification.nType.SHALOM));
+                connections.broadcast(command.getGameID(), ctx.session, new Notification(moveMessage(user, move, validGame), Notification.nType.MOVE));
+                String status = getGameStatus(validGame.game(), nextTurn);
+                if (!status.isEmpty()) {
+                    connections.broadcast(command.getGameID(), null, new Notification(prepMessage(opUser, validGame) + " is in " + status, Notification.nType.SHALOM));
                 }
             }
         }
@@ -168,6 +156,20 @@ public class WebSocketHandler implements WsConnectHandler, WsCloseHandler, WsMes
         return verify(authToken).username();
     }
 
+    private String getGameStatus(ChessGame game, ChessGame.TeamColor color) {
+        if (game.isInCheck(color)) {
+            if (game.isInCheckmate(color)) {
+                return "checkmate";
+            }
+            else {
+                return "check";
+            }
+        } else if (game.isInStalemate(color)) {
+            return "stalemate";
+        }
+        return "";
+    }
+
 
     private String connectMessage(String user, GameData game) {
         return prepMessage(user, game) + " joined the game!";
@@ -177,8 +179,8 @@ public class WebSocketHandler implements WsConnectHandler, WsCloseHandler, WsMes
         return prepMessage(user, game) + " left the game :(";
     }
 
-    private String moveMessage(String user, ChessMove move) {
-        return user + ": " + move;
+    private String moveMessage(String user, ChessMove move, GameData game) {
+        return prepMessage(user, game) + ": " + move;
     }
 
     private String prepMessage(String user, GameData game) {
