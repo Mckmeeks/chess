@@ -112,6 +112,10 @@ public class ChessGame {
             board.addPiece(move.getEndPosition(), temp);
             team.add(move.getEndPosition());
             opTeam.remove(move.getEndPosition());
+            if (temp.getPieceType().equals(ChessPiece.PieceType.KING)) {
+                if (temp.getTeamColor() == TeamColor.WHITE) { wKingLoc = move.getEndPosition(); }
+                else { bKingLoc = move.getEndPosition(); }
+            }
             setTeamTurn(temp.getTeamColor() == TeamColor.WHITE ? TeamColor.BLACK : TeamColor.WHITE);
         } else {
             throw new InvalidMoveException("Attempted Invalid Move");
