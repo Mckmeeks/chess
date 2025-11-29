@@ -21,6 +21,9 @@ import websocket.messages.*;
 
 import com.google.gson.Gson;
 
+import static chess.ChessGame.TeamColor.FINISHED;
+import static websocket.messages.Notification.NotificationType.*;
+
 
 public class WebSocketHandler implements WsConnectHandler, WsCloseHandler, WsMessageHandler {
     private final ConnectionManager connections;
@@ -77,7 +80,7 @@ public class WebSocketHandler implements WsConnectHandler, WsCloseHandler, WsMes
             ctx.send(new Gson().toJson(new LoadGame(game)));
             connections.add(command.getGameID(), ctx.session);
             String user = getUser(command.getAuthToken());
-            connections.broadcast(command.getGameID(), ctx.session, new Notification(connectMessage(user, game), Notification.NotificationType.SHALOM));
+            connections.broadcast(command.getGameID(), ctx.session, new Notification(connectMessage(user, game), SHALOM));
         }
     }
 
@@ -88,7 +91,7 @@ public class WebSocketHandler implements WsConnectHandler, WsCloseHandler, WsMes
             String user = getUser(command.getAuthToken());
             connections.remove(game.gameID(), ctx.session);
             leaveGame(game, user);
-            connections.broadcast(command.getGameID(), null, new Notification(leaveMessage(user, game), Notification.NotificationType.SHALOM));
+            connections.broadcast(command.getGameID(), null, new Notification(leaveMessage(user, game), SHALOM));
             ctx.closeSession();
         }
     }
@@ -101,13 +104,13 @@ public class WebSocketHandler implements WsConnectHandler, WsCloseHandler, WsMes
             if (user == null) {ctx.send(toJSON(new ErrorMessage("Error: Invalid Authorization")));}
             else {
                 ChessGame internalGame = game.game();
-                if (!user.equals(game.whiteUsername()) & !user.equals(game.blackUsername()) | internalGame.getTeamTurn().equals(ChessGame.TeamColor.FINISHED)) {
+                if (!user.equals(game.whiteUsername()) & !user.equals(game.blackUsername()) | internalGame.getTeamTurn().equals(FINISHED)) {
                     ctx.send(toJSON(new ErrorMessage("Error: Invalid Authorization")));
                 }
                 else {
-                    internalGame.setTeamTurn(ChessGame.TeamColor.FINISHED);
-                    gDAO.updateGame(command.getGameID(), new GameData(game.gameID(), game.whiteUsername(), game.blackUsername(), game.gameName(), internalGame));
-                    connections.broadcast(command.getGameID(), null, new Notification(prepMessage(user, game) + " resigned", Notification.NotificationType.SHALOM));
+                    internalGame.setTeamTurn(FINISHED);
+                    gDAO.updateGame(command.getGameID(), game);
+                    connections.broadcast(command.getGameID(), null, new Notification(prepMessage(user, game) + " resigned", SHALOM));
                 }
             }
         }
@@ -119,7 +122,7 @@ public class WebSocketHandler implements WsConnectHandler, WsCloseHandler, WsMes
         ChessMove move = command.getMove();
         String user = getUser(command.getAuthToken());
         if (game == null) {ctx.send(toJSON(new ErrorMessage("Error: Invalid GameID")));}
-        else if (game.game().getTeamTurn() == ChessGame.TeamColor.FINISHED) {ctx.send(toJSON(new ErrorMessage("Error: game is finished")));}
+        else if (game.game().getTeamTurn() == FINISHED) {ctx.send(toJSON(new ErrorMessage("Error: game is finished")));}
         else if (move == null) {ctx.send(toJSON(new ErrorMessage("Error: Invalid Chess Move")));}
         else {
             GameData validGame = checkGameMove(game, move, user);
@@ -134,10 +137,10 @@ public class WebSocketHandler implements WsConnectHandler, WsCloseHandler, WsMes
                 String opUser;
                 if (user.equals(validGame.whiteUsername())) {opUser = validGame.blackUsername();} else {opUser = validGame.whiteUsername();}
                 connections.broadcast(command.getGameID(), null, new LoadGame(validGame));
-                connections.broadcast(command.getGameID(), ctx.session, new Notification(moveMessage(user, move, validGame), Notification.NotificationType.MOVE));
+                connections.broadcast(command.getGameID(), ctx.session, new Notification(moveMessage(user, move, validGame), MOVE));
                 String status = getGameStatus(validGame.game(), nextTurn);
                 if (!status.isEmpty()) {
-                    connections.broadcast(command.getGameID(), null, new Notification(prepMessage(opUser, validGame) + " is in " + status, Notification.NotificationType.SHALOM));
+                    connections.broadcast(command.getGameID(), null, new Notification(stateMessage(opUser, validGame, status), SHALOM));
                 }
             }
         }
@@ -181,6 +184,10 @@ public class WebSocketHandler implements WsConnectHandler, WsCloseHandler, WsMes
 
     private String moveMessage(String user, ChessMove move, GameData game) {
         return prepMessage(user, game) + ": " + move;
+    }
+
+    private String stateMessage(String opUser, GameData validGame, String status) {
+        return prepMessage(opUser, validGame) + " is in " + status;
     }
 
     private String prepMessage(String user, GameData game) {
