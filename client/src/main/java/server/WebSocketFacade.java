@@ -1,27 +1,20 @@
 package server;
 
 import chess.ChessMove;
-import com.google.gson.Gson;
-import exception.ResponseException;
-
-import jakarta.websocket.*;
-
-import org.glassfish.tyrus.client.ClientManager;
-
-
-//import io.javalin.websocket.*;
 
 import ui.MessageUI;
 
 import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
-import websocket.messages.ServerMessage;
 
-import java.io.IOException;
+import com.google.gson.Gson;
+import exception.ResponseException;
+
+import jakarta.websocket.*;
 
 import java.net.URI;
+import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.List;
 
 public class WebSocketFacade extends Endpoint {
     public final WebSocketContainer container;
@@ -37,7 +30,6 @@ public class WebSocketFacade extends Endpoint {
         this.messageUI = messageUI;
 
         this.session.addMessageHandler(String.class, message -> {
-//            System.out.println("Server message: " + message);
             try {
                 messageUI.call(message);
             } catch (Exception e) {
@@ -107,15 +99,6 @@ public class WebSocketFacade extends Endpoint {
         } catch (IOException ex) {
             System.out.println("IOException: " + ex.getMessage());
         }
-
-
-//        session.getAsyncRemote().sendText(json, result -> {
-//            if (result.isOK()) {
-//                System.out.println("Sent: " + json);
-//            } else {
-//                System.out.println("Failed to send: " + result.getException());
-//            }
-//        });
     }
 
     private void waitForOpen() throws ResponseException {
