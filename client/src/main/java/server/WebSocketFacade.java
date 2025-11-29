@@ -68,7 +68,7 @@ public class WebSocketFacade extends Endpoint {
             waitForOpen();
             send(new MakeMoveCommand(authToken, gameID, move));
         } catch (Exception ex) {
-            System.out.println(ex.getMessage());
+            throw new ResponseException(ResponseException.Code.ServerError, ex.getMessage());
         }
     }
 
