@@ -77,7 +77,7 @@ public class WebSocketHandler implements WsConnectHandler, WsCloseHandler, WsMes
             ctx.send(new Gson().toJson(new LoadGame(game)));
             connections.add(command.getGameID(), ctx.session);
             String user = getUser(command.getAuthToken());
-            connections.broadcast(command.getGameID(), ctx.session, new Notification(connectMessage(user, game), Notification.nType.SHALOM));
+            connections.broadcast(command.getGameID(), ctx.session, new Notification(connectMessage(user, game), Notification.NotificationType.SHALOM));
         }
     }
 
@@ -88,7 +88,7 @@ public class WebSocketHandler implements WsConnectHandler, WsCloseHandler, WsMes
             String user = getUser(command.getAuthToken());
             connections.remove(game.gameID(), ctx.session);
             leaveGame(game, user);
-            connections.broadcast(command.getGameID(), null, new Notification(leaveMessage(user, game), Notification.nType.SHALOM));
+            connections.broadcast(command.getGameID(), null, new Notification(leaveMessage(user, game), Notification.NotificationType.SHALOM));
             ctx.closeSession();
         }
     }
@@ -107,7 +107,7 @@ public class WebSocketHandler implements WsConnectHandler, WsCloseHandler, WsMes
                 else {
                     internalGame.setTeamTurn(ChessGame.TeamColor.FINISHED);
                     gDAO.updateGame(command.getGameID(), new GameData(game.gameID(), game.whiteUsername(), game.blackUsername(), game.gameName(), internalGame));
-                    connections.broadcast(command.getGameID(), null, new Notification(prepMessage(user, game) + " resigned", Notification.nType.SHALOM));
+                    connections.broadcast(command.getGameID(), null, new Notification(prepMessage(user, game) + " resigned", Notification.NotificationType.SHALOM));
                 }
             }
         }
@@ -134,10 +134,10 @@ public class WebSocketHandler implements WsConnectHandler, WsCloseHandler, WsMes
                 String opUser;
                 if (user.equals(validGame.whiteUsername())) {opUser = validGame.blackUsername();} else {opUser = validGame.whiteUsername();}
                 connections.broadcast(command.getGameID(), null, new LoadGame(validGame));
-                connections.broadcast(command.getGameID(), ctx.session, new Notification(moveMessage(user, move, validGame), Notification.nType.MOVE));
+                connections.broadcast(command.getGameID(), ctx.session, new Notification(moveMessage(user, move, validGame), Notification.NotificationType.MOVE));
                 String status = getGameStatus(validGame.game(), nextTurn);
                 if (!status.isEmpty()) {
-                    connections.broadcast(command.getGameID(), null, new Notification(prepMessage(opUser, validGame) + " is in " + status, Notification.nType.SHALOM));
+                    connections.broadcast(command.getGameID(), null, new Notification(prepMessage(opUser, validGame) + " is in " + status, Notification.NotificationType.SHALOM));
                 }
             }
         }

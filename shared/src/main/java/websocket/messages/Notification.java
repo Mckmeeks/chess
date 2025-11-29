@@ -2,14 +2,14 @@ package websocket.messages;
 
 public class Notification extends ServerMessage {
     private final String message;
-    private final nType notificationType;
+    private final NotificationType notificationType;
 
-    public enum nType {
+    public enum NotificationType {
         SHALOM,
         MOVE,
     }
 
-    public Notification(String message, nType type) {
+    public Notification(String message, NotificationType type) {
         super(ServerMessageType.NOTIFICATION);
         this.message = message;
         this.notificationType = type;
@@ -19,7 +19,7 @@ public class Notification extends ServerMessage {
         return message;
     }
 
-    public nType getType() {
+    public NotificationType getType() {
         return notificationType;
     }
 }
