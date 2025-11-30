@@ -134,13 +134,11 @@ public class WebSocketHandler implements WsConnectHandler, WsCloseHandler, WsMes
                 ctx.send(toJSON(new ErrorMessage(error)));
             } else {
                 updateGameMove(validGame);
-                String opUser;
-                if (user.equals(validGame.whiteUsername())) {opUser = validGame.blackUsername();} else {opUser = validGame.whiteUsername();}
                 connections.broadcast(command.getGameID(), null, new LoadGame(validGame));
                 connections.broadcast(command.getGameID(), ctx.session, new Notification(moveMessage(user, move, validGame), MOVE));
                 String status = getGameStatus(validGame.game(), nextTurn);
                 if (!status.isEmpty()) {
-                    connections.broadcast(command.getGameID(), null, new Notification(stateMessage(opUser, validGame, status), SHALOM));
+                    connections.broadcast(command.getGameID(), null, new Notification(stateMessage(user, validGame, status), SHALOM));
                 }
             }
         }
@@ -186,8 +184,19 @@ public class WebSocketHandler implements WsConnectHandler, WsCloseHandler, WsMes
         return prepMessage(user, game) + ": " + move;
     }
 
-    private String stateMessage(String opUser, GameData validGame, String status) {
-        return prepMessage(opUser, validGame) + " is in " + status;
+    private String stateMessage(String user, GameData validGame, String status) {
+        String opUser;
+        if (user.equals(validGame.whiteUsername())) {opUser = validGame.blackUsername();} else {opUser = validGame.whiteUsername();}
+        if (opUser == null) {
+            if (user.equals(validGame.whiteUsername())) {
+                opUser = "Black player ";
+            } else {
+                opUser = "White player ";
+            }
+            return opUser + "is in " + status;
+        } else {
+            return prepMessage(opUser, validGame) + " is in " + status;
+        }
     }
 
     private String prepMessage(String user, GameData game) {
