@@ -81,7 +81,7 @@ public class WebSocketHandler implements WsConnectHandler, WsCloseHandler, WsMes
             connections.add(command.getGameID(), ctx.session);
             String user = getUser(command.getAuthToken());
             connections.broadcast(command.getGameID(), ctx.session, new Notification(connectMessage(user, game), SHALOM));
-            String state = stateMessage(user, game);
+            String state = stateMessage(game);
             if (!state.isEmpty()) {
                 connections.broadcast(command.getGameID(), null, new Notification(state, SHALOM));
             }
@@ -140,7 +140,7 @@ public class WebSocketHandler implements WsConnectHandler, WsCloseHandler, WsMes
                 updateGameMove(validGame);
                 connections.broadcast(command.getGameID(), null, new LoadGame(validGame));
                 connections.broadcast(command.getGameID(), ctx.session, new Notification(moveMessage(user, move, validGame), MOVE));
-                String state = stateMessage(user, validGame);
+                String state = stateMessage(validGame);
                 if (!state.isEmpty()) {
                     connections.broadcast(command.getGameID(), null, new Notification(state, SHALOM));
                 }
@@ -188,7 +188,7 @@ public class WebSocketHandler implements WsConnectHandler, WsCloseHandler, WsMes
         return prepMessage(user, game) + ": " + move;
     }
 
-    private String stateMessage(String user, GameData validGame) {
+    private String stateMessage(GameData validGame) {
         String opUser = "White player ";
         String gameStatus = getGameStatus(validGame.game(), WHITE);
         if (!gameStatus.isEmpty()) {
