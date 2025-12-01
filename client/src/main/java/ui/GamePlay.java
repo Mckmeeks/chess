@@ -18,13 +18,13 @@ public class GamePlay {
     private final String authToken;
     private final int gameID;
     private ChessGame.TeamColor userColor;
-    private final String user;
+//    private final String user;
     private boolean both;
 
     public GamePlay(ServerFacade server, String user, String authToken, int gameID) throws ResponseException {
         this.authToken = authToken;
         this.gameID = gameID;
-        this.user = user;
+//        this.user = user;
         this.both = false;
 
         GetResult result = server.getGame(new GetRequest(gameID), authToken);
