@@ -21,7 +21,7 @@ import websocket.messages.*;
 
 import com.google.gson.Gson;
 
-import static chess.ChessGame.TeamColor.FINISHED;
+import static chess.ChessGame.TeamColor.*;
 import static websocket.messages.Notification.NotificationType.*;
 
 
@@ -81,6 +81,10 @@ public class WebSocketHandler implements WsConnectHandler, WsCloseHandler, WsMes
             connections.add(command.getGameID(), ctx.session);
             String user = getUser(command.getAuthToken());
             connections.broadcast(command.getGameID(), ctx.session, new Notification(connectMessage(user, game), SHALOM));
+            String state = stateMessage(user, game);
+            if (!state.isEmpty()) {
+                connections.broadcast(command.getGameID(), null, new Notification(state, SHALOM));
+            }
         }
     }
 
@@ -136,9 +140,9 @@ public class WebSocketHandler implements WsConnectHandler, WsCloseHandler, WsMes
                 updateGameMove(validGame);
                 connections.broadcast(command.getGameID(), null, new LoadGame(validGame));
                 connections.broadcast(command.getGameID(), ctx.session, new Notification(moveMessage(user, move, validGame), MOVE));
-                String status = getGameStatus(validGame.game(), nextTurn);
-                if (!status.isEmpty()) {
-                    connections.broadcast(command.getGameID(), null, new Notification(stateMessage(user, validGame, status), SHALOM));
+                String state = stateMessage(user, validGame);
+                if (!state.isEmpty()) {
+                    connections.broadcast(command.getGameID(), null, new Notification(state, SHALOM));
                 }
             }
         }
@@ -184,18 +188,26 @@ public class WebSocketHandler implements WsConnectHandler, WsCloseHandler, WsMes
         return prepMessage(user, game) + ": " + move;
     }
 
-    private String stateMessage(String user, GameData validGame, String status) {
-        String opUser;
-        if (user.equals(validGame.whiteUsername())) {opUser = validGame.blackUsername();} else {opUser = validGame.whiteUsername();}
-        if (opUser == null) {
-            if (user.equals(validGame.whiteUsername())) {
-                opUser = "Black player ";
-            } else {
-                opUser = "White player ";
+    private String stateMessage(String user, GameData validGame) {
+        String opUser = "White player ";
+        String gameStatus = getGameStatus(validGame.game(), WHITE);
+        if (!gameStatus.isEmpty()) {
+            if (validGame.whiteUsername() != null) {
+                opUser = validGame.whiteUsername();
+                return prepMessage(opUser, validGame) + " is in " + gameStatus;
             }
-            return opUser + "is in " + status;
+            return opUser + "is in " + gameStatus;
         } else {
-            return prepMessage(opUser, validGame) + " is in " + status;
+            opUser = "Black player ";
+            gameStatus = getGameStatus(validGame.game(), BLACK);
+            if (!gameStatus.isEmpty()) {
+                if (validGame.blackUsername() != null) {
+                    opUser = validGame.blackUsername();
+                    return prepMessage(opUser, validGame) + " is in " + gameStatus;
+                }
+                return opUser + "is in " + gameStatus;
+            }
+            return "";
         }
     }
 
@@ -239,7 +251,7 @@ public class WebSocketHandler implements WsConnectHandler, WsCloseHandler, WsMes
                 if (!user.equals(game.blackUsername())) {
                     return null;
                 }
-                nextColor = ChessGame.TeamColor.WHITE;
+                nextColor = WHITE;
             }
             default -> {return null;}
         }
