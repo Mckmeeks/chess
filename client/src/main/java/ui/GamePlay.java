@@ -18,17 +18,30 @@ public class GamePlay {
     private final String authToken;
     private final int gameID;
     private ChessGame.TeamColor userColor;
+    private final String user;
+    private boolean both;
 
     public GamePlay(ServerFacade server, String user, String authToken, int gameID) throws ResponseException {
         this.authToken = authToken;
         this.gameID = gameID;
+        this.user = user;
+        this.both = false;
 
         GetResult result = server.getGame(new GetRequest(gameID), authToken);
         GameData game = result.game();
 
-        if (user.equals(game.whiteUsername())) {userColor = ChessGame.TeamColor.WHITE;}
-        else if (user.equals(game.blackUsername())) {userColor = ChessGame.TeamColor.BLACK;}
-        else {userColor = null;}
+        if (game.whiteUsername() != null & game.blackUsername() != null) {
+            if (user.equals(game.whiteUsername()) & user.equals(game.blackUsername())) {
+                this.both = true;
+            }
+        }
+        if (user.equals(game.whiteUsername())) {
+            userColor = ChessGame.TeamColor.WHITE;
+        } else if (user.equals(game.blackUsername())) {
+            userColor = ChessGame.TeamColor.BLACK;
+        } else {
+            userColor = null;
+        }
 
         this.messageUI = new MessageUI(userColor, game);
         this.webSocket = server.getWebSocket(this.messageUI);
@@ -107,7 +120,11 @@ public class GamePlay {
         if (prompt.length > 3) {piece = checkPiece(prompt[3]);}
         ChessMove proposedMove = new ChessMove(checkLoc(prompt[1]), checkLoc(prompt[2]), piece);
         if (messageUI.getCurrentGame().game().getTeamTurn() == ChessGame.TeamColor.FINISHED) {throw new IllegalArgumentException("Game is finished");}
-        else if (!messageUI.getCurrentGame().game().getTeamTurn().equals(userColor)) {throw new IllegalArgumentException("It's not your turn!");}
+        else if (!messageUI.getCurrentGame().game().getTeamTurn().equals(userColor)) {
+            if (!both) {
+                throw new IllegalArgumentException("It's not your turn!");
+            }
+        }
         webSocket.makeMove(authToken, gameID, proposedMove);
     }
 
