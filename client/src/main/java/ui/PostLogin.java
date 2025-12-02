@@ -62,7 +62,7 @@ public class PostLogin {
                 default -> help();
             }
         } catch (ResponseException ex) {
-            if (ex.code().equals(ResponseException.Code.ServerError)) {System.out.print("Server Error, try again");}
+            if (ex.code().equals(ResponseException.Code.ServerError)) {System.out.print("Server Error, try again ");}
             else {System.out.print(Arrays.stream(ex.getMessage().split(": ")).toList().getLast());}
         } catch (Exception ex) {
             System.out.print(ex.getMessage());
