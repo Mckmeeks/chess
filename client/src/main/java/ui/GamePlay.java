@@ -19,11 +19,13 @@ public class GamePlay {
     private final int gameID;
     private ChessGame.TeamColor userColor;
     private boolean both;
+    private final Scanner scanner;
 
     public GamePlay(ServerFacade server, String user, String authToken, int gameID) throws ResponseException {
         this.authToken = authToken;
         this.gameID = gameID;
         this.both = false;
+        this.scanner = new Scanner(System.in);
 
         GetResult result = server.getGame(new GetRequest(gameID), authToken);
         GameData game = result.game();
@@ -51,7 +53,6 @@ public class GamePlay {
     }
 
     public void run() {
-        Scanner scanner = new Scanner(System.in);
         var userPrompt = "";
 
         while (!userPrompt.equals("leave")) {
@@ -128,7 +129,13 @@ public class GamePlay {
     }
 
     private void resign() throws ResponseException {
-        webSocket.resign(authToken, gameID);
+        System.out.print("Are you sure you want to resign? (y/n) ");
+        String response = scanner.nextLine();
+        if (response.equalsIgnoreCase("y")) {
+            webSocket.resign(authToken, gameID);
+        } else {
+            printPrompt();
+        }
     }
 
     private void highlight(String[] prompt) {
@@ -150,7 +157,7 @@ public class GamePlay {
     }
 
     private void printPrompt() {
-        System.out.print("\n" + RESET_TEXT_COLOR + "[LOGGED_IN] >>> " + SET_TEXT_COLOR_BLUE);
+        System.out.print("\n" + RESET_TEXT_COLOR + "[GAME_PLAY] >>> " + SET_TEXT_COLOR_BLUE);
     }
 
     private ChessPosition checkLoc(String loc) {
