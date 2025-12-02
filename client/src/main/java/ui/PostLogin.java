@@ -63,7 +63,7 @@ public class PostLogin {
             }
         } catch (ResponseException ex) {
             if (ex.code().equals(ResponseException.Code.ServerError)) {System.out.print("Server Error, try again");}
-            else {System.out.print(ex.getMessage());}
+            else {System.out.print(Arrays.stream(ex.getMessage().split(": ")).toList().getLast());}
         } catch (Exception ex) {
             System.out.print(ex.getMessage());
         }
@@ -132,7 +132,6 @@ public class PostLogin {
     private void observeGame(String[] prompt) throws ResponseException {
         if (prompt.length != 2) {throw new IllegalArgumentException("Invalid arguments: observe requires a game ID");}
         int id = testIdInput(prompt[1]);
-//        boolean observer;
         GamePlay gameUI = new GamePlay(server, user, authToken, clientToGameIDs.get(id));
         gameUI.run();
         help();
