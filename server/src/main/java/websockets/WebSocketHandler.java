@@ -177,11 +177,15 @@ public class WebSocketHandler implements WsConnectHandler, WsCloseHandler, WsMes
 
 
     private String connectMessage(String user, GameData game) {
-        return prepMessage(user, game) + " joined the game!";
+        String message = prepMessage(user, game);
+        if (message.equals(user)) {return "Player " + user + " joined the game as observer!";}
+        return message + " joined the game!";
     }
 
     private String leaveMessage(String user, GameData game) {
-        return prepMessage(user, game) + " left the game :(";
+        String message = prepMessage(user, game);
+        if (message.equals(user)) {return "Observer " + user + " left the game :(";}
+        return message + " left the game :(";
     }
 
     private String moveMessage(String user, ChessMove move, GameData game) {
@@ -215,15 +219,14 @@ public class WebSocketHandler implements WsConnectHandler, WsCloseHandler, WsMes
     }
 
     private String prepMessage(String user, GameData game) {
-        String playerColor = "";
         if (game.whiteUsername() != null & game.blackUsername() != null) {
             if (user.equals(game.whiteUsername()) & user.equals(game.blackUsername())) {
                 return "Player " + user;
             }
         }
-        if (user.equals(game.whiteUsername())) {playerColor = "White player ";}
-        else if (user.equals(game.blackUsername())) {playerColor =  "Black player ";}
-        return playerColor + user;
+        if (user.equals(game.whiteUsername())) {return "White player " + user;}
+        else if (user.equals(game.blackUsername())) {return "Black player " + user;}
+        return user;
     }
 
 
