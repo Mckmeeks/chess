@@ -1,14 +1,12 @@
 package ui;
 
 import exception.ResponseException;
-import jakarta.websocket.DeploymentException;
+
 import server.ServerFacade;
 
 import result.*;
 import request.*;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.Scanner;
 
