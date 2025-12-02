@@ -84,7 +84,6 @@ public class WebSocketHandler implements WsConnectHandler, WsCloseHandler, WsMes
             String state = stateMessage(game);
             if (!state.isEmpty()) {
                 ctx.send(new Gson().toJson(new Notification(state, SHALOM)));
-//                connections.broadcast(command.getGameID(), null, new Notification(state, SHALOM));
             }
         }
     }
@@ -220,8 +219,6 @@ public class WebSocketHandler implements WsConnectHandler, WsCloseHandler, WsMes
         if (game.whiteUsername() != null & game.blackUsername() != null) {
             if (user.equals(game.whiteUsername()) & user.equals(game.blackUsername())) {
                 return "Player " + user;
-//                playerColor = (game.game().getTeamTurn() == WHITE) ? "White player " : "Black player ";
-//                return playerColor + user;
             }
         }
         if (user.equals(game.whiteUsername())) {playerColor = "White player ";}
