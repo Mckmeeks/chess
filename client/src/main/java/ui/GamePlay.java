@@ -64,7 +64,7 @@ public class GamePlay {
         try {
             switch (prompt[0]) {
                 case "redraw" -> redraw();
-                case "leave" -> leave();
+                case "leave" -> leave(prompt);
                 case "move" -> { if (userColor != null) {makeMove(prompt);} else {help();} }
                 case "resign" -> { if (userColor != null) {resign();} else {help();} }
                 case "highlight" -> highlight(prompt);
@@ -108,7 +108,8 @@ public class GamePlay {
         messageUI.draw();
     }
 
-    private void leave() throws ResponseException {
+    private void leave(String[] prompt) throws ResponseException {
+        if (prompt.length != 1) {throw new IllegalArgumentException("To leave the game, use the command 'leave'");}
         webSocket.leave(authToken, gameID);
     }
 
