@@ -7,6 +7,7 @@ public class Notification extends ServerMessage {
     public enum NotificationType {
         SHALOM,
         MOVE,
+        RESIGN
     }
 
     public Notification(String message, NotificationType type) {

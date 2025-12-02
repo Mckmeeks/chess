@@ -83,7 +83,7 @@ public class WebSocketHandler implements WsConnectHandler, WsCloseHandler, WsMes
             connections.broadcast(command.getGameID(), ctx.session, new Notification(connectMessage(user, game), SHALOM));
             String state = stateMessage(game);
             if (!state.isEmpty()) {
-                ctx.send(new Notification(state, SHALOM));
+                ctx.send(new Gson().toJson(new Notification(state, SHALOM)));
 //                connections.broadcast(command.getGameID(), null, new Notification(state, SHALOM));
             }
         }
@@ -115,7 +115,7 @@ public class WebSocketHandler implements WsConnectHandler, WsCloseHandler, WsMes
                 else {
                     internalGame.setTeamTurn(FINISHED);
                     gDAO.updateGame(command.getGameID(), game);
-                    connections.broadcast(command.getGameID(), null, new Notification(prepMessage(user, game) + " resigned", SHALOM));
+                    connections.broadcast(command.getGameID(), null, new Notification(prepMessage(user, game) + " resigned", RESIGN));
                 }
             }
         }
